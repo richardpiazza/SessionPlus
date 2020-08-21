@@ -1,4 +1,7 @@
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 /// Protocol used to extend an `HTTPDataClient` with support for
 /// injecting and retrieving canned responses.
@@ -71,7 +74,7 @@ public struct InjectedPath: Hashable {
     }
 }
 
-/// A response to provide for a pre-determinied request.
+/// A response to provide for a pre-determined request.
 public struct InjectedResponse {
     public var statusCode: Int = 0
     public var headers: HTTP.Headers?

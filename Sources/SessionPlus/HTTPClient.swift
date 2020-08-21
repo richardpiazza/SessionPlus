@@ -1,8 +1,11 @@
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 /// The essential components of a HTTP/REST/JSON Client.
 ///
-/// This protocol expresses a lightweight wrapper around Foundations `URLSeesion`
+/// This protocol expresses a lightweight wrapper around Foundations `URLSession`
 /// for interacting with JSON REST API's.
 public protocol HTTPClient {
     
@@ -20,11 +23,11 @@ public protocol HTTPClient {
     func request(method: HTTP.RequestMethod, path: String, queryItems: [URLQueryItem]?, data: Data?) throws -> URLRequest
     
     /// Creates a URLSessionDataTask using the URLSession.
-    /// Allows access to the unstarted task, usefull for background execution.
+    /// Allows access to the un-started task, useful for background execution.
     func task(request: URLRequest, completion: @escaping HTTP.DataTaskCompletion) throws -> URLSessionDataTask
     
     /// Executes the specified request.
-    /// Gets the task from `task(request:_,completion:_)` and calls `.resume()`.
+    /// Gets the task from `task(request:completion:)` and calls `.resume()`.
     func execute(request: URLRequest, completion: @escaping HTTP.DataTaskCompletion)
 }
 

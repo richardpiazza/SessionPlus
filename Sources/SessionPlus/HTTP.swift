@@ -1,4 +1,7 @@
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 /// A Collection of methods/headers/values/types used during basic HTTP
 /// interactions.

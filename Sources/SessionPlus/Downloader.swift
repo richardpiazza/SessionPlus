@@ -1,4 +1,7 @@
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 public typealias DownloaderDataCompletion = (_ statusCode: Int, _ responseData: Data?, _ error: Error?) -> Void
 
@@ -12,7 +15,7 @@ open class Downloader {
         case invalidBaseURL
         
         public var localizedDescription: String {
-            return "Invalid Base URL: You can not use a `path` method without specifiying a baseURL."
+            return "Invalid Base URL: You can not use a `path` method without specifying a baseURL."
         }
     }
     
@@ -23,10 +26,20 @@ open class Downloader {
         configuration.requestCachePolicy = .returnCacheDataElseLoad
         return URLSession(configuration: configuration, delegate: nil, delegateQueue: nil)
     }()
-    #if targetEnvironment(macCatalyst)
-    fileprivate var cache: URLCache = URLCache(memoryCapacity: Downloader.twentyFiveMB, diskCapacity: Downloader.twoHundredMB)
+    #if canImport(FoundationNetworking)
+    private let cache: URLCache = URLCache(memoryCapacity: Downloader.twentyFiveMB, diskCapacity: Downloader.twoHundredMB, diskPath: "Downloader")
     #else
-    fileprivate var cache: URLCache = URLCache(memoryCapacity: Downloader.twentyFiveMB, diskCapacity: Downloader.twoHundredMB, diskPath: "Downloader")
+    private let cache: URLCache = {
+        if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
+            return URLCache(memoryCapacity: Downloader.twentyFiveMB, diskCapacity: Downloader.twoHundredMB)
+        } else {
+            #if targetEnvironment(macCatalyst)
+            return URLCache(memoryCapacity: Downloader.twentyFiveMB, diskCapacity: Downloader.twoHundredMB)
+            #else
+            return URLCache(memoryCapacity: Downloader.twentyFiveMB, diskCapacity: Downloader.twoHundredMB, diskPath: "Downloader")
+            #endif
+        }
+    }()
     #endif
     public var baseURL: URL?
     public var timeout: TimeInterval = 20
@@ -87,31 +100,31 @@ open class Downloader {
 }
 
 #if (os(iOS) || os(tvOS))
-    import UIKit
-    
-    public typealias DownloaderImageCompletion = (_ statusCode: Int, _ responseImage: UIImage?, _ error: Error?) -> Void
-    
-    /// A wrapper for `URLSession` similar to `WebAPI` for general purpose
-    /// downloading of data and images.
-    public extension Downloader {
-        func getImageAtPath(_ path: String, cachePolicy: URLRequest.CachePolicy, completion: @escaping DownloaderImageCompletion) {
-            guard let url = self.urlForPath(path) else {
-                completion(0, nil, Errors.invalidBaseURL)
-                return
-            }
-            
-            self.getImageAtURL(url, cachePolicy: cachePolicy, completion: completion)
+import UIKit
+
+public typealias DownloaderImageCompletion = (_ statusCode: Int, _ responseImage: UIImage?, _ error: Error?) -> Void
+
+/// A wrapper for `URLSession` similar to `WebAPI` for general purpose
+/// downloading of data and images.
+public extension Downloader {
+    func getImageAtPath(_ path: String, cachePolicy: URLRequest.CachePolicy, completion: @escaping DownloaderImageCompletion) {
+        guard let url = self.urlForPath(path) else {
+            completion(0, nil, Errors.invalidBaseURL)
+            return
         }
         
-        func getImageAtURL(_ url: URL, cachePolicy: URLRequest.CachePolicy, completion: @escaping DownloaderImageCompletion) {
-            self.getDataAtURL(url, cachePolicy: cachePolicy) { (statusCode, responseData, error) -> Void in
-                var image: UIImage?
-                if responseData != nil {
-                    image = UIImage(data: responseData!)
-                }
-                
-                completion(statusCode, image, error)
+        self.getImageAtURL(url, cachePolicy: cachePolicy, completion: completion)
+    }
+    
+    func getImageAtURL(_ url: URL, cachePolicy: URLRequest.CachePolicy, completion: @escaping DownloaderImageCompletion) {
+        self.getDataAtURL(url, cachePolicy: cachePolicy) { (statusCode, responseData, error) -> Void in
+            var image: UIImage?
+            if responseData != nil {
+                image = UIImage(data: responseData!)
             }
+            
+            completion(statusCode, image, error)
         }
     }
+}
 #endif
