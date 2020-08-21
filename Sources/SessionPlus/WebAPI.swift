@@ -86,6 +86,7 @@ public extension WebAPI {
     }
 }
 
+#if !canImport(FoundationNetworking)
 /// A preconfigured URLSessionDelegate that will ignore invalid/self-signed SSL Certificates.
 public class SelfSignedSessionDelegate: NSObject, URLSessionDelegate {
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
@@ -104,3 +105,4 @@ public class SelfSignedSessionDelegate: NSObject, URLSessionDelegate {
         completionHandler(.useCredential, credentials)
     }
 }
+#endif
