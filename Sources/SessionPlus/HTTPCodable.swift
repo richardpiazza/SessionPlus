@@ -7,8 +7,8 @@ public extension HTTP {
     typealias CodableTaskCompletion<D: Decodable> = (_ statusCode: Int, _ headers: Headers?, _ data: D?, _ error: Swift.Error?) -> Void
 }
 
-/// Protocol used to extend an `HTTPDataClient` with support for
-/// automatic encoding and decoding or request and response data.
+/// Protocol used to extend an `HTTPClient` with support for automatic encoding and decoding or request and response
+/// data.
 public protocol HTTPCodable {
     var jsonEncoder: JSONEncoder { get set }
     var jsonDecoder: JSONDecoder { get set }

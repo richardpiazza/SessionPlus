@@ -5,8 +5,7 @@ import FoundationNetworking
 
 /// The essential components of a HTTP/REST/JSON Client.
 ///
-/// This protocol expresses a lightweight wrapper around Foundations `URLSession`
-/// for interacting with JSON REST API's.
+/// This protocol expresses a lightweight wrapper around Foundations `URLSession` for interacting with JSON REST API's.
 public protocol HTTPClient {
     
     /// The root URL used to construct all queries.

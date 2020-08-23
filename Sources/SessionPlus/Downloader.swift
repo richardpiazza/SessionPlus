@@ -5,8 +5,7 @@ import FoundationNetworking
 
 public typealias DownloaderDataCompletion = (_ statusCode: Int, _ responseData: Data?, _ error: Error?) -> Void
 
-/// A wrapper for `URLSession` similar to `WebAPI` for general purpose
-/// downloading of data and images.
+/// A wrapper for `URLSession` similar to `WebAPI` for general purpose downloading of data and images.
 open class Downloader {
     fileprivate static let twentyFiveMB: Int = (1024 * 1024 * 25)
     fileprivate static let twoHundredMB: Int = (1024 * 1024 * 200)
@@ -76,7 +75,7 @@ open class Downloader {
         let urlRequest: URLRequest = request as URLRequest
 
         session.dataTask(with: urlRequest, completionHandler: { (data, response, error) -> Void in
-            #if (os(macOS) || os(iOS) || os(tvOS) || os(watchOS))
+            #if canImport(ObjectiveC)
                 DispatchQueue.main.async(execute: { () -> Void in
                     guard error == nil else {
                         completion(0, data, error)
@@ -104,8 +103,7 @@ import UIKit
 
 public typealias DownloaderImageCompletion = (_ statusCode: Int, _ responseImage: UIImage?, _ error: Error?) -> Void
 
-/// A wrapper for `URLSession` similar to `WebAPI` for general purpose
-/// downloading of data and images.
+/// A wrapper for `URLSession` similar to `WebAPI` for general purpose downloading of data and images.
 public extension Downloader {
     func getImageAtPath(_ path: String, cachePolicy: URLRequest.CachePolicy, completion: @escaping DownloaderImageCompletion) {
         guard let url = self.urlForPath(path) else {

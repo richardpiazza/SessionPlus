@@ -3,11 +3,11 @@ import Foundation
 import FoundationNetworking
 #endif
 
-/// A Collection of methods/headers/values/types used during basic HTTP
-/// interactions.
+/// A Collection of methods/headers/values/types used during basic HTTP interactions.
 public struct HTTP {
     
-    /// HTTP defines a set of request methods to indicate the desired action to be performed for a given resource.
+    /// Desired action to be performed for a given resource.
+    /// 
     /// Although they can also be nouns, these request methods are sometimes referred as HTTP verbs.
     public enum RequestMethod: String {
         case get = "GET"

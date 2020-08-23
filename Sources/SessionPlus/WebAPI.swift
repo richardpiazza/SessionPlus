@@ -3,6 +3,7 @@ import Foundation
 import FoundationNetworking
 #endif
 
+/// A basic implementation of a HTTP/REST/JSON client.
 open class WebAPI: HTTPClient, HTTPCodable, HTTPInjectable {
     
     public var baseURL: URL
@@ -43,8 +44,9 @@ open class WebAPI: HTTPClient, HTTPCodable, HTTPInjectable {
 }
 
 public extension WebAPI {
-    /// Transforms the request into a `multipart/form-data` request.
-    /// The request `content-type` will be set to `image/png`
+    /// Executes a `multipart/form-data` request for image uploading.
+    ///
+    /// The request `content-type` will be set to `image/png`.
     func execute(method: HTTP.RequestMethod, path: String, queryItems: [URLQueryItem]?, pngImageData: Data, filename: String = "image.png", completion: @escaping HTTP.DataTaskCompletion) {
         var request: URLRequest
         do {
@@ -86,7 +88,7 @@ public extension WebAPI {
     }
 }
 
-#if !canImport(FoundationNetworking)
+#if canImport(ObjectiveC)
 /// A preconfigured URLSessionDelegate that will ignore invalid/self-signed SSL Certificates.
 public class SelfSignedSessionDelegate: NSObject, URLSessionDelegate {
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {

@@ -3,8 +3,7 @@ import Foundation
 import FoundationNetworking
 #endif
 
-/// Protocol used to extend an `HTTPDataClient` with support for
-/// injecting and retrieving canned responses.
+/// Protocol used to extend an `HTTPClient` with support for injecting and retrieving canned responses.
 public protocol HTTPInjectable {
     var injectedResponses: [InjectedPath : InjectedResponse] { get set }
 }
@@ -30,8 +29,7 @@ public extension HTTPInjectable where Self: HTTPClient {
     }
 }
 
-/// A Hashable compound type based on the method and absolute path of
-/// a URLRequest.
+/// A Hashable compound type based on the method and absolute path of a URLRequest.
 public struct InjectedPath: Hashable {
     var method: HTTP.RequestMethod = .get
     var absolutePath: String
