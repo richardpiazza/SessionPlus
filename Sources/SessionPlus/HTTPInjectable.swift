@@ -35,22 +35,17 @@ public struct InjectedPath: Hashable {
     var absolutePath: String
     
     public init(request: URLRequest) {
-        var m = HTTP.RequestMethod.get
-        if let httpMethod = request.httpMethod, let requestMethod = HTTP.RequestMethod(rawValue: httpMethod) {
-            m = requestMethod
-        }
-        var a = ""
-        if let url = request.url {
-            a = url.absoluteString
-        }
-        self.init(method: m, absolutePath: a)
+        let method = HTTP.RequestMethod(stringLiteral: request.httpMethod ?? HTTP.RequestMethod.get.rawValue)
+        let path = request.url?.absoluteString ?? ""
+        self.init(method: method, absolutePath: path)
     }
     
+    @available(*, deprecated, renamed: "init(method:absolutePath:)")
     public init(string: String) {
         self.init(method: .get, absolutePath: string)
     }
     
-    public init(method: HTTP.RequestMethod, absolutePath: String) {
+    public init(method: HTTP.RequestMethod = .get, absolutePath: String) {
         self.method = method
         self.absolutePath = absolutePath
     }

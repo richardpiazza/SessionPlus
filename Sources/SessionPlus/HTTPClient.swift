@@ -48,8 +48,8 @@ public extension HTTPClient {
             request.setValue("\(data.count)", forHTTPHeader: HTTP.Header.contentLength)
         }
         request.setValue(HTTP.Header.dateFormatter.string(from: Date()), forHTTPHeader: HTTP.Header.date)
-        request.setValue(HTTP.MIMEType.applicationJson.rawValue, forHTTPHeader: HTTP.Header.accept)
-        request.setValue(HTTP.MIMEType.applicationJson.rawValue, forHTTPHeader: HTTP.Header.contentType)
+        request.setValue(HTTP.MIMEType.json, forHTTPHeader: HTTP.Header.accept)
+        request.setValue(HTTP.MIMEType.json, forHTTPHeader: HTTP.Header.contentType)
         
         if let authorization = self.authorization {
             request.setValue(authorization.headerValue, forHTTPHeader: HTTP.Header.authorization)

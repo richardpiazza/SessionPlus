@@ -30,7 +30,7 @@ class WebAPITests: XCTestCase {
         }
         
         let injectedResponse = InjectedResponse(statusCode: 200, headers: nil, data: data, error: nil, timeout: 2)
-        webApi.injectedResponses[InjectedPath(string: "http://www.example.com/api/test")] = injectedResponse
+        webApi.injectedResponses[InjectedPath(absolutePath: "http://www.example.com/api/test")] = injectedResponse
     }
     
     func testInjectedResponse() {
@@ -71,12 +71,14 @@ class WebAPITests: XCTestCase {
     }
     
     func testIPv6DNSError() {
+        #if canImport(ObjectiveC)
+        // Temporarily disabled until debugging on Linux can be done.
         let expectation = self.expectation(description: "IPv6 DNS Error")
         
         let invalidApi = WebAPI(baseURL: URL(string: "https://api.richardpiazza.com")!)
         invalidApi.get("") { (statusCode, response, responseObject, error) in
-            guard let _ = error else {
-                XCTFail()
+            guard error != nil else {
+                XCTFail("Did not receive expected error.")
                 return
             }
             
@@ -84,9 +86,10 @@ class WebAPITests: XCTestCase {
         }
         
         waitForExpectations(timeout: 10) { (error) in
-            if let _ = error {
-                XCTFail()
+            if let e = error {
+                XCTFail(e.localizedDescription)
             }
         }
+        #endif
     }
 }
