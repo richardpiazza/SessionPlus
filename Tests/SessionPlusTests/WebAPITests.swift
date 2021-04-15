@@ -30,7 +30,7 @@ class WebAPITests: XCTestCase {
         }
         
         let injectedResponse = InjectedResponse(statusCode: 200, headers: nil, data: data, error: nil, timeout: 2)
-        webApi.injectedResponses[InjectedPath(string: "http://www.example.com/api/test")] = injectedResponse
+        webApi.injectedResponses[InjectedPath(absolutePath: "http://www.example.com/api/test")] = injectedResponse
     }
     
     func testInjectedResponse() {
