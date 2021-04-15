@@ -75,8 +75,8 @@ class WebAPITests: XCTestCase {
         
         let invalidApi = WebAPI(baseURL: URL(string: "https://api.richardpiazza.com")!)
         invalidApi.get("") { (statusCode, response, responseObject, error) in
-            guard let _ = error else {
-                XCTFail()
+            guard error != nil else {
+                XCTFail("Did not receive expected error.")
                 return
             }
             
@@ -84,8 +84,8 @@ class WebAPITests: XCTestCase {
         }
         
         waitForExpectations(timeout: 10) { (error) in
-            if let _ = error {
-                XCTFail()
+            if let e = error {
+                XCTFail(e.localizedDescription)
             }
         }
     }
