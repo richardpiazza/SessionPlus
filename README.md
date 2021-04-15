@@ -12,26 +12,6 @@ A collection of extensions &amp; wrappers around URLSession.
 
 This package has been designed to work across multiple swift environments by utilizing conditional checks. It has been tested on Apple platforms (macOS, iOS, tvOS, watchOS), as well as Linux (Ubuntu).
 
-## Usage
-
-**SessionPlus** is distributed using the [Swift Package Manager](https://swift.org/package-manager). To install it into a project, add it as a dependency within your `Package.swift` manifest:
-
-```swift
-let package = Package(
-    ...
-    dependencies: [
-        .package(url: "https://github.com/richardpiazza/SessionPlus.git", .upToNextMinor(from: "1.0.0")
-    ],
-    ...
-)
-```
-
-Then import the **SessionPlus** packages wherever you'd like to use it:
-
-```swift
-import SessionPlus
-```
-
 ## Quick Start
 
 Checkout the `WebAPI` class.
@@ -95,3 +75,24 @@ public protocol HTTPInjectable {
 ```
 
 The `HTTPInjectable` protocol is used to extend an `HTTPClient` implementation by overriding the default `execute(request:completion:)` implementation to allow for the definition and usage of predefined responses. This makes for simple testing!
+
+## Installation
+
+**SessionPlus** is distributed using the [Swift Package Manager](https://swift.org/package-manager). 
+To install it into a project, add it as a dependency within your `Package.swift` manifest:
+
+```swift
+let package = Package(
+    ...
+    dependencies: [
+        .package(url: "https://github.com/richardpiazza/SessionPlus.git", .upToNextMinor(from: "1.1.0")
+    ],
+    ...
+)
+```
+
+Then import the **SessionPlus** packages wherever you'd like to use it:
+
+```swift
+import SessionPlus
+```

@@ -15,7 +15,7 @@ public protocol HTTPCodable {
 }
 
 public extension HTTPCodable where Self: HTTPClient {
-    fileprivate func encode<E: Encodable>(_ encodable: E?) throws -> Data? {
+    func encode<E: Encodable>(_ encodable: E?) throws -> Data? {
         var data: Data? = nil
         if let encodable = encodable {
             data = try jsonEncoder.encode(encodable)
@@ -23,7 +23,7 @@ public extension HTTPCodable where Self: HTTPClient {
         return data
     }
     
-    fileprivate func decode<D: Decodable>(statusCode: Int, headers: HTTP.Headers?, data: Data?, error: Swift.Error?, completion: @escaping HTTP.CodableTaskCompletion<D>) {
+    func decode<D: Decodable>(statusCode: Int, headers: HTTP.Headers?, data: Data?, error: Swift.Error?, completion: @escaping HTTP.CodableTaskCompletion<D>) {
         guard let data = data else {
             completion(statusCode, headers, nil, error)
             return

@@ -36,8 +36,8 @@ public struct InjectedPath: Hashable {
     
     public init(request: URLRequest) {
         var m = HTTP.RequestMethod.get
-        if let httpMethod = request.httpMethod, let requestMethod = HTTP.RequestMethod(rawValue: httpMethod) {
-            m = requestMethod
+        if let httpMethod = request.httpMethod {
+            m = HTTP.RequestMethod(stringLiteral: httpMethod)
         }
         var a = ""
         if let url = request.url {
