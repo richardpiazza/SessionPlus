@@ -17,7 +17,7 @@ public extension HTTPInjectable where Self: HTTPClient {
             return
         }
         
-        #if (os(macOS) || os(iOS) || os(tvOS) || os(watchOS))
+        #if canImport(ObjectiveC)
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(injectedResponse.timeout * NSEC_PER_SEC)) / Double(NSEC_PER_SEC), execute: { () -> Void in
             switch injectedResponse.result {
             case .failure(let error):
@@ -43,17 +43,21 @@ public extension HTTPInjectable where Self: HTTPClient {
 @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
 public extension HTTPInjectable where Self: HTTPClient {
     func execute(request: URLRequest) async throws -> HTTP.AsyncDataTaskOutput {
-        let injectedPath = InjectedPath(request: request)
-        guard let injectedResponse = injectedResponses[injectedPath] else {
-            throw HTTP.Error.invalidResponse
-        }
-        
-        await Task.sleep(injectedResponse.timeout)
-        switch injectedResponse.result {
-        case .failure(let error):
-            throw error
-        case .success(let data):
-            return (injectedResponse.statusCode, injectedResponse.headers ?? [:], data)
+        if #available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *) {
+            let injectedPath = InjectedPath(request: request)
+            guard let injectedResponse = injectedResponses[injectedPath] else {
+                throw HTTP.Error.invalidResponse
+            }
+            
+            await Task.sleep(injectedResponse.timeout)
+            switch injectedResponse.result {
+            case .failure(let error):
+                throw error
+            case .success(let data):
+                return (injectedResponse.statusCode, injectedResponse.headers ?? [:], data)
+            }
+        } else {
+            throw HTTP.Error.invalidRequest
         }
     }
 }
