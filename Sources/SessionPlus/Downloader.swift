@@ -147,8 +147,6 @@ open class Downloader {
 }
 
 #if canImport(UIKit)
-import UIKit
-
 @available(*, deprecated, renamed: "Downloader.ImageCompletion")
 public typealias DownloaderImageCompletion = Downloader.ImageCompletion
 
