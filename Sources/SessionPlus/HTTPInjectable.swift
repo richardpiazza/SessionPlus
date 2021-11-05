@@ -43,21 +43,17 @@ public extension HTTPInjectable where Self: HTTPClient {
 @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
 public extension HTTPInjectable where Self: HTTPClient {
     func execute(request: URLRequest) async throws -> HTTP.AsyncDataTaskOutput {
-        if #available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *) {
-            let injectedPath = InjectedPath(request: request)
-            guard let injectedResponse = injectedResponses[injectedPath] else {
-                throw HTTP.Error.invalidResponse
-            }
-            
-            await Task.sleep(injectedResponse.timeout)
-            switch injectedResponse.result {
-            case .failure(let error):
-                throw error
-            case .success(let data):
-                return (injectedResponse.statusCode, injectedResponse.headers ?? [:], data)
-            }
-        } else {
-            throw HTTP.Error.invalidRequest
+        let injectedPath = InjectedPath(request: request)
+        guard let injectedResponse = injectedResponses[injectedPath] else {
+            throw HTTP.Error.invalidResponse
+        }
+        
+        await Task.sleep(injectedResponse.timeout)
+        switch injectedResponse.result {
+        case .failure(let error):
+            throw error
+        case .success(let data):
+            return (injectedResponse.statusCode, injectedResponse.headers ?? [:], data)
         }
     }
 }

@@ -152,17 +152,13 @@ public extension HTTPClient {
 @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
 public extension HTTPClient {
     func execute(request: URLRequest) async throws -> HTTP.AsyncDataTaskOutput {
-        if #available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *) {
-            let sessionData = try await session.data(for: request)
-            
-            guard let httpResponse = sessionData.1 as? HTTPURLResponse else {
-                throw HTTP.Error.invalidResponse
-            }
-            
-            return (httpResponse.statusCode, httpResponse.allHeaderFields, sessionData.0)
-        } else {
-            throw HTTP.Error.invalidRequest
+        let sessionData = try await session.data(for: request)
+        
+        guard let httpResponse = sessionData.1 as? HTTPURLResponse else {
+            throw HTTP.Error.invalidResponse
         }
+        
+        return (httpResponse.statusCode, httpResponse.allHeaderFields, sessionData.0)
     }
     
     /// Convenience method for performing a `GET` request.
