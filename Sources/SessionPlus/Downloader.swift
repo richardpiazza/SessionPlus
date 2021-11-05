@@ -13,7 +13,7 @@ public typealias DownloaderDataCompletion = Downloader.DataCompletion
 open class Downloader {
     
     public typealias DataCompletion = (_ statusCode: Int, _ responseData: Data?, _ error: Error?) -> Void
-    #if swift(>=5.5)
+    #if swift(>=5.5) && canImport(ObjectiveC)
     public typealias AsyncDataCompletion = (statusCode: Int, responseData: Data)
     #endif
     
@@ -120,7 +120,7 @@ open class Downloader {
         self.getDataAtURL(url, cachePolicy: cachePolicy, completion: completion)
     }
     
-    #if swift(>=5.5)
+    #if swift(>=5.5) && canImport(ObjectiveC)
     @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
     open func getDataAtURL(_ url: URL, cachePolicy: URLRequest.CachePolicy) async throws -> AsyncDataCompletion {
         let request = NSMutableURLRequest(url: url, cachePolicy: cachePolicy, timeoutInterval: timeout)

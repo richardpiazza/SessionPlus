@@ -29,7 +29,7 @@ public protocol HTTPClient {
     /// Gets the task from `task(request:completion:)` and calls `.resume()`.
     func execute(request: URLRequest, completion: @escaping HTTP.DataTaskCompletion)
     
-    #if swift(>=5.5)
+    #if swift(>=5.5) && canImport(ObjectiveC)
     /// Executes a `URLRequest`
     ///
     /// Uses the `async` concurrency apis to execute a `URLRequest` and return the result.
@@ -148,7 +148,7 @@ public extension HTTPClient {
     }
 }
 
-#if swift(>=5.5)
+#if swift(>=5.5) && canImport(ObjectiveC)
 @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
 public extension HTTPClient {
     func execute(request: URLRequest) async throws -> HTTP.AsyncDataTaskOutput {

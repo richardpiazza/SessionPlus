@@ -30,7 +30,7 @@ public struct HTTP {
     /// A general completion handler for HTTP requests.
     public typealias DataTaskCompletion = (_ statusCode: Int, _ headers: Headers?, _ data: Data?, _ error: Swift.Error?) -> Void
     
-    #if swift(>=5.5)
+    #if swift(>=5.5) && canImport(ObjectiveC)
     /// The output of an async url request execution.
     public typealias AsyncDataTaskOutput = (statusCode: Int, headers: Headers, data: Data)
     #endif

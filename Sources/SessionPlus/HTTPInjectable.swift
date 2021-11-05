@@ -39,7 +39,7 @@ public extension HTTPInjectable where Self: HTTPClient {
     }
 }
 
-#if swift(>=5.5)
+#if swift(>=5.5) && canImport(ObjectiveC)
 @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
 public extension HTTPInjectable where Self: HTTPClient {
     func execute(request: URLRequest) async throws -> HTTP.AsyncDataTaskOutput {

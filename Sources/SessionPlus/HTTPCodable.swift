@@ -5,7 +5,7 @@ import FoundationNetworking
 
 public extension HTTP {
     typealias CodableTaskCompletion<D: Decodable> = (_ statusCode: Int, _ headers: Headers?, _ data: D?, _ error: Swift.Error?) -> Void
-    #if swift(>=5.5)
+    #if swift(>=5.5) && canImport(ObjectiveC)
     typealias AsyncCodableTaskOutput<D: Decodable> = (statusCode: Int, headers: Headers, data: D)
     #endif
 }
@@ -102,7 +102,7 @@ public extension HTTPCodable where Self: HTTPClient {
     }
 }
 
-#if swift(>=5.5)
+#if swift(>=5.5) && canImport(ObjectiveC)
 @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
 public extension HTTPCodable where Self: HTTPClient {
     func decode<D: Decodable>(response: HTTP.AsyncDataTaskOutput) throws -> HTTP.AsyncCodableTaskOutput<D> {
