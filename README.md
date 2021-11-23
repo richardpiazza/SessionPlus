@@ -12,6 +12,27 @@ A collection of extensions &amp; wrappers around URLSession.
 
 This package has been designed to work across multiple swift environments by utilizing conditional checks. It has been tested on Apple platforms (macOS, iOS, tvOS, watchOS), as well as Linux (Ubuntu).
 
+## Installation
+
+**SessionPlus** is distributed using the [Swift Package Manager](https://swift.org/package-manager). 
+To install it into a project, add it as a dependency within your `Package.swift` manifest:
+
+```swift
+let package = Package(
+    ...
+    dependencies: [
+        .package(url: "https://github.com/richardpiazza/SessionPlus.git", .upToNextMinor(from: "1.1.0")
+    ],
+    ...
+)
+```
+
+Then import the **SessionPlus** packages wherever you'd like to use it:
+
+```swift
+import SessionPlus
+```
+
 ## Quick Start
 
 Checkout the `WebAPI` class.
@@ -51,7 +72,7 @@ public protocol HTTPClient {
 
 `URLSession` is task-driven. The **SessionPlus** api is designed with this in mind; allowing you to construct your request and then either creating a _data task_ for you to references and execute, or automatically executing the request.
 
-Example conformances for `request(method:path:queryItems:data:)`, `task(request:, completion)`, & `execut(request:completion:)` are provided in an extension, so the minimum required conformance to `HTTPClient` is `baseURL`, `session`, and `authorization`.
+Example conformances for `request(method:path:queryItems:data:)`, `task(request:, completion)`, & `execute(request:completion:)` are provided in an extension, so the minimum required conformance to `HTTPClient` is `baseURL`, `session`, and `authorization`.
 
 Convenience methods for the common HTTP request methods **get**, **put**, **post**, **delete**, and **patch**, are all provided.
 
@@ -75,24 +96,3 @@ public protocol HTTPInjectable {
 ```
 
 The `HTTPInjectable` protocol is used to extend an `HTTPClient` implementation by overriding the default `execute(request:completion:)` implementation to allow for the definition and usage of predefined responses. This makes for simple testing!
-
-## Installation
-
-**SessionPlus** is distributed using the [Swift Package Manager](https://swift.org/package-manager). 
-To install it into a project, add it as a dependency within your `Package.swift` manifest:
-
-```swift
-let package = Package(
-    ...
-    dependencies: [
-        .package(url: "https://github.com/richardpiazza/SessionPlus.git", .upToNextMinor(from: "1.1.0")
-    ],
-    ...
-)
-```
-
-Then import the **SessionPlus** packages wherever you'd like to use it:
-
-```swift
-import SessionPlus
-```

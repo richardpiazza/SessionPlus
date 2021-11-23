@@ -9,7 +9,7 @@ public struct HTTP {
     /// HTTP Headers as provided from HTTPURLResponse
     public typealias Headers = [AnyHashable : Any]
     
-    /// General errors that may be emitted during HTTP Request/Response handling.
+    /// General errors that may be encountered during HTTP request/response handling.
     public enum Error: Swift.Error, LocalizedError {
         case invalidURL
         case invalidRequest
@@ -37,10 +37,20 @@ public struct HTTP {
 }
 
 public extension URLRequest {
+    /// Sets a value for the header field.
+    ///
+    /// - parameters:
+    ///   - value: The new value for the header field. Any existing value for the field is replaced by the new value.
+    ///   - header: The header for which to set the value. (Headers are case sensitive)
     mutating func setValue(_ value: String, forHTTPHeader header: HTTP.Header) {
         self.setValue(value, forHTTPHeaderField: header.rawValue)
     }
     
+    /// Sets a value for the header field.
+    ///
+    /// - parameters:
+    ///   - value: The new value for the header field. Any existing value for the field is replaced by the new value.
+    ///   - header: The header for which to set the value. (Headers are case sensitive)
     mutating func setValue(_ value: HTTP.MIMEType, forHTTPHeader header: HTTP.Header) {
         self.setValue(value.rawValue, forHTTPHeaderField: header.rawValue)
     }

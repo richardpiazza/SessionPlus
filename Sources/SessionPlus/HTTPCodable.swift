@@ -105,39 +105,51 @@ public extension HTTPCodable where Self: HTTPClient {
 #if swift(>=5.5) && canImport(ObjectiveC)
 @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
 public extension HTTPCodable where Self: HTTPClient {
+    /// Uses the `jsonDecoder` to deserialize a `Decodable` type from the provided response.
+    ///
+    /// - throws: `DecodingError`
+    /// - parameters:
+    ///   - response: The output from an async request.
+    /// - returns: Output with the decoded response.
     func decode<D: Decodable>(response: HTTP.AsyncDataTaskOutput) throws -> HTTP.AsyncCodableTaskOutput<D> {
         let result = try jsonDecoder.decode(D.self, from: response.data)
         return (response.statusCode, response.headers, result)
     }
     
+    /// Convenience method for performing a `GET` request and decoding the response.
     func get<D: Decodable>(_ path: String, queryItems: [URLQueryItem]? = nil) async throws -> HTTP.AsyncCodableTaskOutput<D> {
         let response = try await self.get(path, queryItems: queryItems)
         return try decode(response: response)
     }
     
+    /// Convenience method for performing a `PUT` request, encoding as needed, and decoding the response.
     func put<E: Encodable, D: Decodable>(_ encodable: E?, path: String, queryItems: [URLQueryItem]? = nil) async throws -> HTTP.AsyncCodableTaskOutput<D> {
         let data = try encode(encodable)
         let response = try await self.put(data, path: path, queryItems: queryItems)
         return try decode(response: response)
     }
     
+    /// Convenience method for performing a `POST` request, encoding as needed, and decoding the response.
     func post<E: Encodable, D: Decodable>(_ encodable: E?, path: String, queryItems: [URLQueryItem]? = nil) async throws -> HTTP.AsyncCodableTaskOutput<D> {
         let data = try encode(encodable)
         let response = try await self.post(data, path: path, queryItems: queryItems)
         return try decode(response: response)
     }
     
+    /// Convenience method for performing a `POST` request, encoding as needed, and decoding the response.
     func post<D: Decodable>(_ data: Data?, path: String, queryItems: [URLQueryItem]? = nil) async throws -> HTTP.AsyncCodableTaskOutput<D> {
         let response = try await self.post(data, path: path, queryItems: queryItems)
         return try decode(response: response)
     }
     
+    /// Convenience method for performing a `PATCH` request, encoding as needed, and decoding the response.
     func patch<E: Encodable, D: Decodable>(_ encodable: E?, path: String, queryItems: [URLQueryItem]? = nil) async throws -> HTTP.AsyncCodableTaskOutput<D> {
         let data = try encode(encodable)
         let response = try await self.patch(data, path: path, queryItems: queryItems)
         return try decode(response: response)
     }
     
+    /// Convenience method for performing a `DELETE` request and decoding the response.
     func delete<D: Decodable>(_ path: String, queryItems: [URLQueryItem]? = nil) async throws -> HTTP.AsyncCodableTaskOutput<D> {
         let response = try await self.delete(path, queryItems: queryItems)
         return try decode(response: response)
