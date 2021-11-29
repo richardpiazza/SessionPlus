@@ -1,14 +1,9 @@
 import XCTest
 @testable import SessionPlus
 
-class WebAPITests: XCTestCase {
+final class WebAPITests: XCTestCase {
     
-    static var allTests = [
-        ("testInjectedResponse", testInjectedResponse),
-        ("testIPv6DNSError", testIPv6DNSError),
-    ]
-    
-    var api: WebAPI?
+    private var api: WebAPI?
     
     override func setUp() {
         super.setUp()
@@ -29,7 +24,7 @@ class WebAPITests: XCTestCase {
             return
         }
         
-        let injectedResponse = InjectedResponse(statusCode: 200, headers: nil, data: data, error: nil, timeout: 2)
+        let injectedResponse = InjectedResponse(statusCode: 200, timeout: 2, result: .success(data))
         webApi.injectedResponses[InjectedPath(absolutePath: "http://www.example.com/api/test")] = injectedResponse
     }
     
@@ -40,18 +35,11 @@ class WebAPITests: XCTestCase {
             XCTAssertTrue(statusCode == 200)
             XCTAssertNotNil(data)
             
-            var dictionary: [String : String]
+            let dictionary: [String: String]
             do {
-                let dictionaryData = try JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions())
-                if let d = dictionaryData as? [String : String] {
-                    dictionary = d
-                } else {
-                    XCTFail()
-                    return
-                }
+                dictionary = try self.dictionary(data!)
             } catch {
-                print(error)
-                XCTFail()
+                XCTFail(error.localizedDescription)
                 return
             }
             
@@ -70,9 +58,20 @@ class WebAPITests: XCTestCase {
         }
     }
     
+    // Async tests not available on Linux.
+    #if canImport(ObjectiveC)
+    @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
+    func testInjectedResponseAsync() async throws {
+        let response = try await api!.get("test", queryItems: nil)
+        XCTAssertEqual(response.statusCode, 200)
+        let dictionary = try self.dictionary(response.data)
+        XCTAssertEqual(dictionary["name"], "Mock Me")
+    }
+    #endif
+    
+    // Temporarily disabled until debugging on Linux can be done.
+    #if canImport(ObjectiveC)
     func testIPv6DNSError() {
-        #if canImport(ObjectiveC)
-        // Temporarily disabled until debugging on Linux can be done.
         let expectation = self.expectation(description: "IPv6 DNS Error")
         
         let invalidApi = WebAPI(baseURL: URL(string: "https://api.richardpiazza.com")!)
@@ -90,6 +89,16 @@ class WebAPITests: XCTestCase {
                 XCTFail(e.localizedDescription)
             }
         }
-        #endif
+    }
+    #endif
+}
+
+private extension WebAPITests {
+    func dictionary(_ data: Data) throws -> [String: String] {
+        let dictionaryData = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions())
+        guard let dictionary = dictionaryData as? [String: String] else {
+            throw NSError(domain: "WebAPITests.dictionary()", code: 0, userInfo: nil)
+        }
+        return dictionary
     }
 }

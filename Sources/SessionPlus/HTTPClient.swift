@@ -28,6 +28,18 @@ public protocol HTTPClient {
     /// Executes the specified request.
     /// Gets the task from `task(request:completion:)` and calls `.resume()`.
     func execute(request: URLRequest, completion: @escaping HTTP.DataTaskCompletion)
+    
+    #if swift(>=5.5) && canImport(ObjectiveC)
+    /// Executes a `URLRequest`
+    ///
+    /// Uses the `async` concurrency apis to execute a `URLRequest` and return the result.
+    ///
+    /// - parameters:
+    ///    - request: The `URLRequest` to execute
+    /// - returns: Async data output
+    @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
+    func execute(request: URLRequest) async throws -> HTTP.AsyncDataTaskOutput
+    #endif
 }
 
 public extension HTTPClient {
@@ -84,9 +96,7 @@ public extension HTTPClient {
         
         task.resume()
     }
-}
-
-public extension HTTPClient {
+    
     /// Convenience method for generating and executing a request using the `GET` http method.
     func get(_ path: String, queryItems: [URLQueryItem]? = nil, completion: @escaping HTTP.DataTaskCompletion) {
         do {
@@ -137,3 +147,91 @@ public extension HTTPClient {
         }
     }
 }
+
+#if swift(>=5.5) && canImport(ObjectiveC)
+@available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
+public extension HTTPClient {
+    func execute(request: URLRequest) async throws -> HTTP.AsyncDataTaskOutput {
+        let sessionData = try await session.data(for: request)
+        
+        guard let httpResponse = sessionData.1 as? HTTPURLResponse else {
+            throw HTTP.Error.invalidResponse
+        }
+        
+        return (httpResponse.statusCode, httpResponse.allHeaderFields, sessionData.0)
+    }
+    
+    /// Convenience method for performing a `GET` request.
+    ///
+    /// This method first creates a `URLRequest` using the `request(method:path:queryItems:data:)` method. Then it passes the
+    /// request as a parameter to the `async` `execute(request:)` method.
+    ///
+    /// - parameters:
+    ///   - path: Component path extension that is appended to the `baseURL`.
+    ///   - queryItems: Key/Value components added to the request `URL`.
+    /// - returns: Awaited response data output
+    func get(_ path: String, queryItems: [URLQueryItem]? = nil) async throws -> HTTP.AsyncDataTaskOutput {
+        let request = try self.request(method: .get, path: path, queryItems: queryItems, data: nil)
+        return try await execute(request: request)
+    }
+    
+    /// Convenience method for performing a `PUT` request.
+    ///
+    /// This method first creates a `URLRequest` using the `request(method:path:queryItems:data:)` method. Then it passes the
+    /// request as a parameter to the `async` `execute(request:)` method.
+    ///
+    /// - parameters:
+    ///   - data: Data that should be presented as the `URLRequest` body.
+    ///   - path: Component path extension that is appended to the `baseURL`.
+    ///   - queryItems: Key/Value components added to the request `URL`.
+    /// - returns: Awaited response data output
+    func put(_ data: Data?, path: String, queryItems: [URLQueryItem]? = nil) async throws -> HTTP.AsyncDataTaskOutput {
+        let request = try self.request(method: .put, path: path, queryItems: queryItems, data: data)
+        return try await execute(request: request)
+    }
+    
+    /// Convenience method for performing a `POST` request.
+    ///
+    /// This method first creates a `URLRequest` using the `request(method:path:queryItems:data:)` method. Then it passes the
+    /// request as a parameter to the `async` `execute(request:)` method.
+    ///
+    /// - parameters:
+    ///   - data: Data that should be presented as the `URLRequest` body.
+    ///   - path: Component path extension that is appended to the `baseURL`.
+    ///   - queryItems: Key/Value components added to the request `URL`.
+    /// - returns: Awaited response data output
+    func post(_ data: Data?, path: String, queryItems: [URLQueryItem]? = nil) async throws -> HTTP.AsyncDataTaskOutput {
+        let request = try self.request(method: .post, path: path, queryItems: queryItems, data: data)
+        return try await execute(request: request)
+    }
+    
+    /// Convenience method for performing a `PATCH` request.
+    ///
+    /// This method first creates a `URLRequest` using the `request(method:path:queryItems:data:)` method. Then it passes the
+    /// request as a parameter to the `async` `execute(request:)` method.
+    ///
+    /// - parameters:
+    ///   - data: Data that should be presented as the `URLRequest` body.
+    ///   - path: Component path extension that is appended to the `baseURL`.
+    ///   - queryItems: Key/Value components added to the request `URL`.
+    /// - returns: Awaited response data output
+    func patch(_ data: Data?, path: String, queryItems: [URLQueryItem]? = nil) async throws -> HTTP.AsyncDataTaskOutput {
+        let request = try self.request(method: .patch, path: path, queryItems: queryItems, data: data)
+        return try await execute(request: request)
+    }
+    
+    /// Convenience method for performing a `DELETE` request.
+    ///
+    /// This method first creates a `URLRequest` using the `request(method:path:queryItems:data:)` method. Then it passes the
+    /// request as a parameter to the `async` `execute(request:)` method.
+    ///
+    /// - parameters:
+    ///   - path: Component path extension that is appended to the `baseURL`.
+    ///   - queryItems: Key/Value components added to the request `URL`.
+    /// - returns: Awaited response data output
+    func delete(_ path: String, queryItems: [URLQueryItem]? = nil) async throws -> HTTP.AsyncDataTaskOutput {
+        let request = try self.request(method: .delete, path: path, queryItems: queryItems, data: nil)
+        return try await execute(request: request)
+    }
+}
+#endif

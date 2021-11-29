@@ -9,32 +9,7 @@ public struct HTTP {
     /// HTTP Headers as provided from HTTPURLResponse
     public typealias Headers = [AnyHashable : Any]
     
-    /// Authorization schemes used in the API
-    public enum Authorization {
-        case basic(username: String, password: String?)
-        case bearer(token: String)
-        case custom(headerField: String, headerValue: String)
-        
-        public var headerValue: String {
-            switch self {
-            case .basic(let username, let password):
-                let pwd = password ?? ""
-                guard let data = "\(username):\(pwd)".data(using: .utf8) else {
-                    return ""
-                }
-                
-                let base64 = data.base64EncodedString(options: [])
-                
-                return "Basic \(base64)"
-            case .bearer(let token):
-                return "Bearer \(token)"
-            case .custom(let headerField, let headerValue):
-                return "\(headerField) \(headerValue))"
-            }
-        }
-    }
-    
-    /// General errors that may be emitted during HTTP Request/Response handling.
+    /// General errors that may be encountered during HTTP request/response handling.
     public enum Error: Swift.Error, LocalizedError {
         case invalidURL
         case invalidRequest
@@ -54,13 +29,28 @@ public struct HTTP {
     
     /// A general completion handler for HTTP requests.
     public typealias DataTaskCompletion = (_ statusCode: Int, _ headers: Headers?, _ data: Data?, _ error: Swift.Error?) -> Void
+    
+    #if swift(>=5.5) && canImport(ObjectiveC)
+    /// The output of an async url request execution.
+    public typealias AsyncDataTaskOutput = (statusCode: Int, headers: Headers, data: Data)
+    #endif
 }
 
 public extension URLRequest {
+    /// Sets a value for the header field.
+    ///
+    /// - parameters:
+    ///   - value: The new value for the header field. Any existing value for the field is replaced by the new value.
+    ///   - header: The header for which to set the value. (Headers are case sensitive)
     mutating func setValue(_ value: String, forHTTPHeader header: HTTP.Header) {
         self.setValue(value, forHTTPHeaderField: header.rawValue)
     }
     
+    /// Sets a value for the header field.
+    ///
+    /// - parameters:
+    ///   - value: The new value for the header field. Any existing value for the field is replaced by the new value.
+    ///   - header: The header for which to set the value. (Headers are case sensitive)
     mutating func setValue(_ value: HTTP.MIMEType, forHTTPHeader header: HTTP.Header) {
         self.setValue(value.rawValue, forHTTPHeaderField: header.rawValue)
     }
