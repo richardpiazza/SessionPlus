@@ -58,19 +58,20 @@ final class WebAPITests: XCTestCase {
         }
     }
     
+    // Async tests not available on Linux.
+    #if canImport(ObjectiveC)
     @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
     func testInjectedResponseAsync() async throws {
-        #if canImport(ObjectiveC)
         let response = try await api!.get("test", queryItems: nil)
         XCTAssertEqual(response.statusCode, 200)
         let dictionary = try self.dictionary(response.data)
         XCTAssertEqual(dictionary["name"], "Mock Me")
-        #endif
     }
+    #endif
     
+    // Temporarily disabled until debugging on Linux can be done.
+    #if canImport(ObjectiveC)
     func testIPv6DNSError() {
-        #if canImport(ObjectiveC)
-        // Temporarily disabled until debugging on Linux can be done.
         let expectation = self.expectation(description: "IPv6 DNS Error")
         
         let invalidApi = WebAPI(baseURL: URL(string: "https://api.richardpiazza.com")!)
@@ -88,8 +89,8 @@ final class WebAPITests: XCTestCase {
                 XCTFail(e.localizedDescription)
             }
         }
-        #endif
     }
+    #endif
 }
 
 private extension WebAPITests {
