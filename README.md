@@ -21,7 +21,7 @@ To install it into a project, add it as a dependency within your `Package.swift`
 let package = Package(
     ...
     dependencies: [
-        .package(url: "https://github.com/richardpiazza/SessionPlus.git", .upToNextMinor(from: "1.1.0")
+        .package(url: "https://github.com/richardpiazza/SessionPlus.git", .upToNextMinor(from: "1.2.0")
     ],
     ...
 )

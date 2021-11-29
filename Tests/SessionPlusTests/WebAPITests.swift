@@ -1,14 +1,9 @@
 import XCTest
 @testable import SessionPlus
 
-class WebAPITests: XCTestCase {
+final class WebAPITests: XCTestCase {
     
-    static var allTests = [
-        ("testInjectedResponse", testInjectedResponse),
-        ("testIPv6DNSError", testIPv6DNSError),
-    ]
-    
-    var api: WebAPI?
+    private var api: WebAPI?
     
     override func setUp() {
         super.setUp()
@@ -40,18 +35,11 @@ class WebAPITests: XCTestCase {
             XCTAssertTrue(statusCode == 200)
             XCTAssertNotNil(data)
             
-            var dictionary: [String : String]
+            let dictionary: [String: String]
             do {
-                let dictionaryData = try JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions())
-                if let d = dictionaryData as? [String : String] {
-                    dictionary = d
-                } else {
-                    XCTFail()
-                    return
-                }
+                dictionary = try self.dictionary(data!)
             } catch {
-                print(error)
-                XCTFail()
+                XCTFail(error.localizedDescription)
                 return
             }
             
@@ -68,6 +56,16 @@ class WebAPITests: XCTestCase {
                 XCTFail()
             }
         }
+    }
+    
+    @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
+    func testInjectedResponseAsync() async throws {
+        #if canImport(ObjectiveC)
+        let response = try await api!.get("test", queryItems: nil)
+        XCTAssertEqual(response.statusCode, 200)
+        let dictionary = try self.dictionary(response.data)
+        XCTAssertEqual(dictionary["name"], "Mock Me")
+        #endif
     }
     
     func testIPv6DNSError() {
@@ -91,5 +89,15 @@ class WebAPITests: XCTestCase {
             }
         }
         #endif
+    }
+}
+
+private extension WebAPITests {
+    func dictionary(_ data: Data) throws -> [String: String] {
+        let dictionaryData = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions())
+        guard let dictionary = dictionaryData as? [String: String] else {
+            throw NSError(domain: "WebAPITests.dictionary()", code: 0, userInfo: nil)
+        }
+        return dictionary
     }
 }
