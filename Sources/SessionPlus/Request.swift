@@ -19,12 +19,11 @@ public protocol Request {
     var body: Data? { get }
     
     /// Instructs the request to create an 'absolute' URL given a particular base/root `URL`.
-    ///
-    /// The default implementation appends the `path` and any `queryItems`.
     func url(using baseURL: URL) throws -> URL
 }
 
 public extension Request {
+    /// The default implementation appends the `path` and any `queryItems`.
     func url(using baseURL: URL) throws -> URL {
         let pathUrl = baseURL.appendingPathComponent(path)
         

@@ -48,7 +48,7 @@ public extension HTTPInjectable where Self: HTTPClient {
             throw HTTP.Error.invalidResponse
         }
         
-        await Task.sleep(injectedResponse.timeout)
+        try await Task.sleep(nanoseconds: injectedResponse.timeout * 1000000000)
         switch injectedResponse.result {
         case .failure(let error):
             throw error

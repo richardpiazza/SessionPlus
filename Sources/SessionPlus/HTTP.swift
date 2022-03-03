@@ -23,6 +23,7 @@ public struct HTTP {
         case invalidURL
         case invalidRequest
         case invalidResponse
+        case undefined(Swift.Error?)
         
         public var errorDescription: String? {
             switch self {
@@ -32,6 +33,8 @@ public struct HTTP {
                 return "Invalid URL Request: URLRequest is nil or invalid."
             case .invalidResponse:
                 return "Invalid URL Response: HTTPURLResponse is nil or invalid."
+            case .undefined(let error):
+                return "Undefined Error: \(error?.localizedDescription ?? "")"
             }
         }
     }
