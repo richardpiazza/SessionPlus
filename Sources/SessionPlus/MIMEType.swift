@@ -2,7 +2,7 @@ import Foundation
 
 public extension HTTP {
     /// MIME Types used in the API
-    struct MIMEType: ExpressibleByStringLiteral, Equatable {
+    struct MIMEType: ExpressibleByStringLiteral, Hashable {
         public let rawValue: String
         
         public init(stringLiteral value: StringLiteralType) {
@@ -11,8 +11,24 @@ public extension HTTP {
     }
 }
 
+extension HTTP.MIMEType: Codable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        rawValue = try container.decode(String.self)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
+    }
+}
+
 extension HTTP.MIMEType: Identifiable {
     public var id: String { rawValue }
+}
+
+extension HTTP.MIMEType: CustomStringConvertible {
+    public var description: String { rawValue }
 }
 
 public extension HTTP.MIMEType {

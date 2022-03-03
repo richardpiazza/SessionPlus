@@ -4,7 +4,7 @@ public extension HTTP {
     /// Desired action to be performed for a given resource.
     ///
     /// Although they can also be nouns, these request methods are sometimes referred as HTTP verbs.
-    struct RequestMethod: ExpressibleByStringLiteral, Equatable {
+    struct RequestMethod: ExpressibleByStringLiteral, Hashable {
         public let rawValue: String
         
         public init(stringLiteral value: String) {
@@ -13,8 +13,24 @@ public extension HTTP {
     }
 }
 
+extension HTTP.RequestMethod: Codable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        rawValue = try container.decode(String.self)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
+    }
+}
+
 extension HTTP.RequestMethod: Identifiable {
     public var id: String { rawValue }
+}
+
+extension HTTP.RequestMethod: CustomStringConvertible {
+    public var description: String { rawValue }
 }
 
 public extension HTTP.RequestMethod {

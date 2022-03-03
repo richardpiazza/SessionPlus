@@ -6,6 +6,15 @@ import FoundationNetworking
 /// A Collection of methods/headers/values/types used during basic HTTP interactions.
 public struct HTTP {
     
+    /// HTTP Header date formatter; RFC1123
+    static var headerDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE',' dd MMM yyyy HH':'mm':'ss 'GMT'"
+        formatter.timeZone = TimeZone(identifier: "GMT")!
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter
+    }()
+    
     /// HTTP Headers as provided from HTTPURLResponse
     public typealias Headers = [AnyHashable : Any]
     
@@ -36,22 +45,9 @@ public struct HTTP {
     #endif
 }
 
-public extension URLRequest {
-    /// Sets a value for the header field.
-    ///
-    /// - parameters:
-    ///   - value: The new value for the header field. Any existing value for the field is replaced by the new value.
-    ///   - header: The header for which to set the value. (Headers are case sensitive)
-    mutating func setValue(_ value: String, forHTTPHeader header: HTTP.Header) {
-        self.setValue(value, forHTTPHeaderField: header.rawValue)
-    }
-    
-    /// Sets a value for the header field.
-    ///
-    /// - parameters:
-    ///   - value: The new value for the header field. Any existing value for the field is replaced by the new value.
-    ///   - header: The header for which to set the value. (Headers are case sensitive)
-    mutating func setValue(_ value: HTTP.MIMEType, forHTTPHeader header: HTTP.Header) {
-        self.setValue(value.rawValue, forHTTPHeaderField: header.rawValue)
-    }
-}
+// The HTTP.* name-spacing will be removed in future versions of SessionPlus.
+public typealias Authorization = HTTP.Authorization
+public typealias Header = HTTP.Header
+public typealias MIMEType = HTTP.MIMEType
+public typealias Method = HTTP.RequestMethod
+public typealias StatusCode = HTTP.StatusCode

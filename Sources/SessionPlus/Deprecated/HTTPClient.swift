@@ -57,14 +57,14 @@ public extension HTTPClient {
         request.httpMethod = method.rawValue
         if let data = data {
             request.httpBody = data
-            request.setValue("\(data.count)", forHTTPHeader: HTTP.Header.contentLength)
+            request.setValue("\(data.count)", forHeader: .contentLength)
         }
-        request.setValue(HTTP.Header.dateFormatter.string(from: Date()), forHTTPHeader: HTTP.Header.date)
-        request.setValue(HTTP.MIMEType.json, forHTTPHeader: HTTP.Header.accept)
-        request.setValue(HTTP.MIMEType.json, forHTTPHeader: HTTP.Header.contentType)
+        request.setValue(HTTP.headerDateFormatter.string(from: Date()), forHeader: .date)
+        request.setValue(.json, forHeader: .accept)
+        request.setValue(.json, forHeader: .contentType)
         
         if let authorization = self.authorization {
-            request.setValue(authorization.headerValue, forHTTPHeader: HTTP.Header.authorization)
+            request.setValue(authorization.headerValue, forHeader: .authorization)
         }
         
         return request
