@@ -6,10 +6,8 @@ import FoundationNetworking
 import UIKit
 #endif
 
-@available(*, deprecated, renamed: "Downloader.DataCompletion")
-public typealias DownloaderDataCompletion = Downloader.DataCompletion
-
 /// A wrapper for `URLSession` similar to `WebAPI` for general purpose downloading of data and images.
+@available(*, deprecated, message: "This will be removed in future versions of SessionPlus.")
 open class Downloader {
     
     public typealias DataCompletion = (_ statusCode: Int, _ responseData: Data?, _ error: Error?) -> Void
@@ -147,9 +145,6 @@ open class Downloader {
 }
 
 #if canImport(UIKit)
-@available(*, deprecated, renamed: "Downloader.ImageCompletion")
-public typealias DownloaderImageCompletion = Downloader.ImageCompletion
-
 /// A wrapper for `URLSession` similar to `WebAPI` for general purpose downloading of data and images.
 public extension Downloader {
     func getImageAtURL(_ url: URL, cachePolicy: URLRequest.CachePolicy, completion: @escaping ImageCompletion) {

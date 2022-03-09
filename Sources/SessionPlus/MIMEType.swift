@@ -56,7 +56,4 @@ public extension HTTP.MIMEType {
     static let txt: Self = "text/plain"
     /// XML
     static let xml: Self = "application/xml"
-    
-    @available(*, deprecated, renamed: "json")
-    static var applicationJson: Self { json }
 }

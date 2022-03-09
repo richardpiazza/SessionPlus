@@ -3,6 +3,7 @@ import Foundation
 import FoundationNetworking
 #endif
 
+@available(*, deprecated, message: "See 'Client' for more information.")
 public extension HTTP {
     typealias CodableTaskCompletion<D: Decodable> = (_ statusCode: Int, _ headers: Headers?, _ data: D?, _ error: Swift.Error?) -> Void
     #if swift(>=5.5) && canImport(ObjectiveC)
@@ -12,11 +13,13 @@ public extension HTTP {
 
 /// Protocol used to extend an `HTTPClient` with support for automatic encoding and decoding or request and response
 /// data.
+@available(*, deprecated, message: "See 'Client' for more information.")
 public protocol HTTPCodable {
     var jsonEncoder: JSONEncoder { get set }
     var jsonDecoder: JSONDecoder { get set }
 }
 
+@available(*, deprecated, message: "See 'Client' for more information.")
 public extension HTTPCodable where Self: HTTPClient {
     func encode<E: Encodable>(_ encodable: E?) throws -> Data? {
         var data: Data? = nil
@@ -104,6 +107,7 @@ public extension HTTPCodable where Self: HTTPClient {
 
 #if swift(>=5.5) && canImport(ObjectiveC)
 @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
+@available(*, deprecated, message: "See 'Client' for more information.")
 public extension HTTPCodable where Self: HTTPClient {
     /// Uses the `jsonDecoder` to deserialize a `Decodable` type from the provided response.
     ///

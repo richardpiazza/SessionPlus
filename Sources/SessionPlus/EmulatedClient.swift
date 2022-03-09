@@ -66,6 +66,19 @@ open class EmulatedClient: Client {
     
     public init(requestResponse: [(Request, Response)]) {
         self.responseCache = [:]
+        requestResponse.forEach {
+            cache(response: $0.1, for: $0.0)
+        }
+    }
+    
+    public func cache(response: Response, for request: Request) {
+        let emulatedRequest = EmulatedRequest(request)
+        responseCache[emulatedRequest.id] = .success(response)
+    }
+    
+    public func cache(error: Error, for request: Request) {
+        let emulatedRequest = EmulatedRequest(request)
+        responseCache[emulatedRequest.id] = .failure(error)
     }
     
     public func performRequest(_ request: Request, completion: @escaping (Result<Response, Error>) -> Void) {
