@@ -8,7 +8,7 @@ public extension URLSessionDelegate {
     static var selfSigned: URLSessionDelegate { SelfSignedSessionDelegate() }
 }
 
-class SelfSignedSessionDelegate: NSObject, URLSessionDelegate {
+public class SelfSignedSessionDelegate: NSObject, URLSessionDelegate {
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         guard challenge.previousFailureCount < 1 else {
             completionHandler(.cancelAuthenticationChallenge, nil)
