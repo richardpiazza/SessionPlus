@@ -3,6 +3,7 @@ import Foundation
 import FoundationNetworking
 #endif
 
+#if canImport(ObjectiveC)
 public extension URLSessionDelegate {
     /// A preconfigured URLSessionDelegate that will ignore invalid/self-signed SSL Certificates.
     static var selfSigned: URLSessionDelegate { SelfSignedSessionDelegate() }
@@ -25,3 +26,4 @@ public class SelfSignedSessionDelegate: NSObject, URLSessionDelegate {
         completionHandler(.useCredential, credentials)
     }
 }
+#endif
