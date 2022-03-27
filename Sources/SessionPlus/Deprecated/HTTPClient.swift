@@ -61,7 +61,7 @@ public extension HTTPClient {
             request.httpBody = data
             request.setValue("\(data.count)", forHeader: .contentLength)
         }
-        request.setValue(HTTP.headerDateFormatter.string(from: Date()), forHeader: .date)
+        request.setValue(Header.dateFormatter.string(from: Date()), forHeader: .date)
         request.setValue(.json, forHeader: .accept)
         request.setValue(.json, forHeader: .contentType)
         

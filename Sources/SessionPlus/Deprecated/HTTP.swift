@@ -4,21 +4,10 @@ import FoundationNetworking
 #endif
 
 /// A Collection of methods/headers/values/types used during basic HTTP interactions.
+@available(*, deprecated)
 public struct HTTP {
-    
-    /// HTTP Header date formatter; RFC1123
-    static var headerDateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "EEE',' dd MMM yyyy HH':'mm':'ss 'GMT'"
-        formatter.timeZone = TimeZone(identifier: "GMT")!
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        return formatter
-    }()
-    
-    /// HTTP Headers as provided from HTTPURLResponse
-    public typealias Headers = [AnyHashable : Any]
-    
     /// General errors that may be encountered during HTTP request/response handling.
+    @available(*, deprecated)
     public enum Error: Swift.Error, LocalizedError {
         case invalidURL
         case invalidRequest
@@ -40,15 +29,18 @@ public struct HTTP {
     }
     
     /// A general completion handler for HTTP requests.
+    @available(*, deprecated)
     public typealias DataTaskCompletion = (_ statusCode: Int, _ headers: Headers?, _ data: Data?, _ error: Swift.Error?) -> Void
     
     #if swift(>=5.5) && canImport(ObjectiveC)
     /// The output of an async url request execution.
+    @available(*, deprecated)
     public typealias AsyncDataTaskOutput = (statusCode: Int, headers: Headers, data: Data)
     #endif
 }
 
 // The HTTP.* name-spacing will be removed in future versions of SessionPlus.
+@available(*, deprecated)
 public extension HTTP {
     @available(*, deprecated, renamed: "Authorization")
     typealias Authorization = SessionPlus.Authorization
@@ -60,4 +52,6 @@ public extension HTTP {
     typealias RequestMethod = Method
     @available(*, deprecated, renamed: "StatusCode")
     typealias StatusCode = SessionPlus.StatusCode
+    @available(*, deprecated, renamed: "Headers")
+    typealias Headers = SessionPlus.Headers
 }

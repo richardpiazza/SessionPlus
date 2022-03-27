@@ -1,4 +1,5 @@
 import Foundation
+import SessionPlus
 
 open class EmulatedClient: Client {
     
@@ -13,7 +14,7 @@ open class EmulatedClient: Client {
         }
         
         public var path: String
-        public var method: Method
+        public var method: SessionPlus.Method
         public var headers: Headers?
         public var queryItems: [URLQueryItem]?
         public var body: Data?

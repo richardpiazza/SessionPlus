@@ -28,22 +28,17 @@ public struct PNGImageFormDataRequest: Request {
         headers[.contentType] = contentType
         self.headers = headers
         
-        let prefix = """
-        --\(boundary)
-        Content-Disposition: form-data; name=\"\(field)\"; filename=\"\(filename)\"
-        Content-Type: image/png
-        
-        
-        """
-        
-        let suffix = """
-        
-        --\(boundary)--
-        
-        """
-        
         var data = Data()
-        let chunks = [prefix.data(using: .utf8), imageData, suffix.data(using: .utf8)]
+        let chunks = [
+            "--\(boundary)".data(using: .utf8),
+            "\r\n".data(using: .utf8),
+            "Content-Disposition: form-data; name=\"\(field)\"; filename=\"\(filename)\"\r\n".data(using: .utf8),
+            "Content-Type: image/png\r\n\r\n".data(using: .utf8),
+            imageData,
+            "\r\n".data(using: .utf8),
+            "--\(boundary)--".data(using: .utf8),
+            "\r\n".data(using: .utf8)
+        ]
         chunks.compactMap { $0 }.forEach { data.append($0) }
         
         self.body = data

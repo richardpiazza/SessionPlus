@@ -13,6 +13,7 @@ public extension URLRequest {
         self.init(url: try request.url(using: baseUrl))
         
         httpMethod = request.method.rawValue
+        setValue(Header.dateFormatter.string(from: Date()), forHeader: .date)
         setValue(.json, forHeader: .accept)
         
         if let body = request.body {

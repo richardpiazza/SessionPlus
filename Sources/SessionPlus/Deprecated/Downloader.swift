@@ -146,6 +146,7 @@ open class Downloader {
 
 #if canImport(UIKit)
 /// A wrapper for `URLSession` similar to `WebAPI` for general purpose downloading of data and images.
+@available(*, deprecated, message: "This will be removed in future versions of SessionPlus.")
 public extension Downloader {
     func getImageAtURL(_ url: URL, cachePolicy: URLRequest.CachePolicy, completion: @escaping ImageCompletion) {
         self.getDataAtURL(url, cachePolicy: cachePolicy) { (statusCode, responseData, error) -> Void in

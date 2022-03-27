@@ -32,13 +32,13 @@ public extension Request {
         }
         
         guard var components = URLComponents(url: pathUrl, resolvingAgainstBaseURL: false) else {
-            throw HTTP.Error.invalidURL
+            throw URLError(.badURL)
         }
         
         components.queryItems = queryItems
         
         guard let url = components.url else {
-            throw HTTP.Error.invalidURL
+            throw URLError(.badURL)
         }
         
         return url

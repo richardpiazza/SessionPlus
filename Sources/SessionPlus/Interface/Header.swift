@@ -7,6 +7,15 @@ public struct Header: ExpressibleByStringLiteral, Hashable {
     public init(stringLiteral value: StringLiteralType) {
         rawValue = value
     }
+    
+    /// HTTP Header date formatter; RFC1123
+    public static var dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE',' dd MMM yyyy HH':'mm':'ss 'GMT'"
+        formatter.timeZone = TimeZone(identifier: "GMT")!
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter
+    }()
 }
 
 extension Header: Codable {

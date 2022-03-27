@@ -1,6 +1,6 @@
 # SessionPlus
 
-A collection of extensions &amp; wrappers around URLSession.
+A swift _request & response_ framework for JSON apis.
 
 <p>
  <img src="https://github.com/richardpiazza/SessionPlus/workflows/Swift/badge.svg?branch=main" />
@@ -15,84 +15,67 @@ This package has been designed to work across multiple swift environments by uti
 ## Installation
 
 **SessionPlus** is distributed using the [Swift Package Manager](https://swift.org/package-manager). 
-To install it into a project, add it as a dependency within your `Package.swift` manifest:
+You can add it using Xcode or by listing it as a dependency in your `Package.swift` manifest:
 
 ```swift
 let package = Package(
-    ...
-    dependencies: [
-        .package(url: "https://github.com/richardpiazza/SessionPlus.git", .upToNextMinor(from: "1.2.0")
-    ],
-    ...
+  ...
+  dependencies: [
+    .package(url: "https://github.com/richardpiazza/SessionPlus.git", .upToNextMajor(from: "2.0.0")
+  ],
+  ...
+  targets: [
+    .target(
+      name: "MyPackage",
+      dependnecies: [
+        "SessionPlus"
+      ]
+    )
+  ]
 )
 ```
 
-Then import the **SessionPlus** packages wherever you'd like to use it:
+## Usage
+
+**SessionPlus** offers a default implementation (`URLSessionClient`) that allows for requesting data from a JSON api. For example:
 
 ```swift
-import SessionPlus
+let url = URL(string: "https://api.agify.io")!
+let client = URLSessionClient(baseURL: url)
+let request = Get(queryItems: [URLQueryItem(name: "name", value: "bob")])
+let response = try await client.request(request)
 ```
 
-## Quick Start
+### Decoding
 
-Checkout the `WebAPI` class.
+The `Client` protocol also offers extensions for automatically decoding responses to any `Decodable` type.
 
 ```swift
-open class WebAPI: HTTPClient, HTTPCodable, HTTPInjectable {
-    
-    public var baseURL: URL
-    public var session: URLSession
-    public var authorization: HTTP.Authorization?
-    public var jsonEncoder: JSONEncoder = JSONEncoder()
-    public var jsonDecoder: JSONDecoder = JSONDecoder()
-    public var injectedResponses: [InjectedPath : InjectedResponse] = [:]
-    …
-    public init(baseURL: URL, session: URLSession? = nil, delegate: URLSessionDelegate? = nil) {
-        …
-    }
+struct ApiResult: Decodable {
+  let name: String
+  let age: Int
+  let count: Int
 }
+
+
+let response = try await client.request(request) as ApiResult
+...
+let response: ApiResult = try await client.request(request)
 ```
 
-`WebAPI` provides a basic implementation for an _out-of-the-box_ HTTP/REST/JSON client.
+### Flexibility
 
-## Components
-
-### HTTPClient
+The `Client` protocol declares up to three forms requests based on platform abilities:
 
 ```swift
-public protocol HTTPClient {
-    var baseURL: URL { get }
-    var session: URLSession { get set }
-    var authorization: HTTP.Authorization? { get set }
-    func request(method: HTTP.RequestMethod, path: String, queryItems: [URLQueryItem]?, data: Data?) throws -> URLRequest
-    func task(request: URLRequest, completion: @escaping HTTP.DataTaskCompletion) throws -> URLSessionDataTask
-    func execute(request: URLRequest, completion: @escaping HTTP.DataTaskCompletion)
-}
+// async/await for swift 5.5+
+func performRequest(_ request: Request) async throws -> Response
+// completion handler for backwards compatibility
+func performRequest(_ request: Request, completion: @escaping (Result<Response, Error>) -> Void)
+// Combine publisher that emits with a response
+func performRequest(_ request: Request) -> AnyPublisher<Response, Error>
 ```
 
-`URLSession` is task-driven. The **SessionPlus** api is designed with this in mind; allowing you to construct your request and then either creating a _data task_ for you to references and execute, or automatically executing the request.
+## Contribution
 
-Example conformances for `request(method:path:queryItems:data:)`, `task(request:, completion)`, & `execute(request:completion:)` are provided in an extension, so the minimum required conformance to `HTTPClient` is `baseURL`, `session`, and `authorization`.
-
-Convenience methods for the common HTTP request methods **get**, **put**, **post**, **delete**, and **patch**, are all provided.
-
-### HTTPCodable
-
-```swift
-public protocol HTTPCodable {
-    var jsonEncoder: JSONEncoder { get set }
-    var jsonDecoder: JSONDecoder { get set }
-}
-```
-
-The `HTTPCodable` protocol is used to extend an `HTTPClient` implementation with support for encoding and decoding of JSON bodies.
-
-### HTTPInjectable
-
-```swift
-public protocol HTTPInjectable {
-    var injectedResponses: [InjectedPath : InjectedResponse] { get set }
-}
-```
-
-The `HTTPInjectable` protocol is used to extend an `HTTPClient` implementation by overriding the default `execute(request:completion:)` implementation to allow for the definition and usage of predefined responses. This makes for simple testing!
+Contributions to **SessionPlus** are welcomed and encouraged! See the [Contribution Guide](CONTRIBUTING.md) for more information.
