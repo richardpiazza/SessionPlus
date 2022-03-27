@@ -4,6 +4,7 @@ import FoundationNetworking
 #endif
 
 /// A basic implementation of a HTTP/REST/JSON client.
+@available(*, deprecated, message: "See 'URLSessionClient' for more information.")
 open class WebAPI: HTTPClient, HTTPCodable, HTTPInjectable {
     
     public var baseURL: URL
@@ -43,10 +44,12 @@ open class WebAPI: HTTPClient, HTTPCodable, HTTPInjectable {
     }
 }
 
+@available(*, deprecated, message: "See 'URLSessionClient' for more information.")
 public extension WebAPI {
     /// Executes a `multipart/form-data` request for image uploading.
     ///
     /// The request `content-type` will be set to `image/png`.
+    @available(*, deprecated, message: "See `PNGImageFormDataRequest`.")
     func execute(method: HTTP.RequestMethod, path: String, queryItems: [URLQueryItem]?, pngImageData: Data, filename: String = "image.png", completion: @escaping HTTP.DataTaskCompletion) {
         var request: URLRequest
         do {
@@ -87,24 +90,3 @@ public extension WebAPI {
         self.execute(request: request, completion: completion)
     }
 }
-
-#if canImport(ObjectiveC)
-/// A preconfigured URLSessionDelegate that will ignore invalid/self-signed SSL Certificates.
-public class SelfSignedSessionDelegate: NSObject, URLSessionDelegate {
-    public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        guard challenge.previousFailureCount < 1 else {
-            completionHandler(.cancelAuthenticationChallenge, nil)
-            return
-        }
-        
-        var credentials: URLCredential?
-        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust {
-            if let serverTrust = challenge.protectionSpace.serverTrust {
-                credentials = URLCredential(trust: serverTrust)
-            }
-        }
-        
-        completionHandler(.useCredential, credentials)
-    }
-}
-#endif

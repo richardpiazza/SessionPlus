@@ -1,23 +1,15 @@
 import Foundation
 
-public extension HTTP {
-    /// Command HTTP Header
-    struct Header: ExpressibleByStringLiteral, Equatable {
-        public let rawValue: String
-        
-        public init(stringLiteral value: StringLiteralType) {
-            rawValue = value
-        }
+/// Command HTTP Header
+public struct Header: ExpressibleByStringLiteral, Hashable {
+    public let rawValue: String
+    
+    public init(stringLiteral value: StringLiteralType) {
+        rawValue = value
     }
-}
-
-extension HTTP.Header: Identifiable {
-    public var id: String { rawValue }
-}
-
-public extension HTTP.Header {
+    
     /// HTTP Header date formatter; RFC1123
-    static var dateFormatter: DateFormatter = {
+    public static var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "EEE',' dd MMM yyyy HH':'mm':'ss 'GMT'"
         formatter.timeZone = TimeZone(identifier: "GMT")!
@@ -26,9 +18,28 @@ public extension HTTP.Header {
     }()
 }
 
-public extension HTTP.Header {
-    /// The Accept request HTTP header advertises which content types, expressed as MIME types, the client is able to
-    /// understand.
+extension Header: Codable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        rawValue = try container.decode(String.self)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
+    }
+}
+
+extension Header: Identifiable {
+    public var id: String { rawValue }
+}
+
+extension Header: CustomStringConvertible {
+    public var description: String { rawValue }
+}
+
+public extension Header {
+    /// The Accept request HTTP header advertises which content types, expressed as MIME types, the client is able to understand.
     static let accept: Self = "Accept"
     /// The HTTP Authorization request header contains the credentials to authenticate a user agent with a server,
     /// usually after the server has responded with a 401 Unauthorized status and the WWW-Authenticate header.

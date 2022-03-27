@@ -1,6 +1,7 @@
 import XCTest
 @testable import SessionPlus
 
+@available(*, deprecated)
 final class WebAPITests: XCTestCase {
     
     private var api: WebAPI?
@@ -93,6 +94,7 @@ final class WebAPITests: XCTestCase {
     #endif
 }
 
+@available(*, deprecated)
 private extension WebAPITests {
     func dictionary(_ data: Data) throws -> [String: String] {
         let dictionaryData = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions())

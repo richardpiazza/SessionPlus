@@ -1,21 +1,35 @@
 import Foundation
 
-public extension HTTP {
-    /// MIME Types used in the API
-    struct MIMEType: ExpressibleByStringLiteral, Equatable {
-        public let rawValue: String
-        
-        public init(stringLiteral value: StringLiteralType) {
-            rawValue = value
-        }
+/// MIME Types used in the API
+public struct MIMEType: ExpressibleByStringLiteral, Hashable {
+    public let rawValue: String
+    
+    public init(stringLiteral value: StringLiteralType) {
+        rawValue = value
     }
 }
 
-extension HTTP.MIMEType: Identifiable {
+extension MIMEType: Codable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        rawValue = try container.decode(String.self)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
+    }
+}
+
+extension MIMEType: Identifiable {
     public var id: String { rawValue }
 }
 
-public extension HTTP.MIMEType {
+extension MIMEType: CustomStringConvertible {
+    public var description: String { rawValue }
+}
+
+public extension MIMEType {
     /// Any kind of binary data
     static let bin: Self = "application/octet-stream"
     /// Graphics Interchange Format (GIF)
@@ -40,7 +54,4 @@ public extension HTTP.MIMEType {
     static let txt: Self = "text/plain"
     /// XML
     static let xml: Self = "application/xml"
-    
-    @available(*, deprecated, renamed: "json")
-    static var applicationJson: Self { json }
 }

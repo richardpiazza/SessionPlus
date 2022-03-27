@@ -6,6 +6,7 @@ import FoundationNetworking
 /// The essential components of a HTTP/REST/JSON Client.
 ///
 /// This protocol expresses a lightweight wrapper around Foundations `URLSession` for interacting with JSON REST API's.
+@available(*, deprecated, message: "See 'Client' for more information.")
 public protocol HTTPClient {
     
     /// The root URL used to construct all queries.
@@ -42,6 +43,7 @@ public protocol HTTPClient {
     #endif
 }
 
+@available(*, deprecated, message: "See 'Client' for more information.")
 public extension HTTPClient {
     func request(method: HTTP.RequestMethod, path: String, queryItems: [URLQueryItem]?, data: Data?) throws -> URLRequest {
         let pathURL = baseURL.appendingPathComponent(path)
@@ -57,14 +59,14 @@ public extension HTTPClient {
         request.httpMethod = method.rawValue
         if let data = data {
             request.httpBody = data
-            request.setValue("\(data.count)", forHTTPHeader: HTTP.Header.contentLength)
+            request.setValue("\(data.count)", forHeader: .contentLength)
         }
-        request.setValue(HTTP.Header.dateFormatter.string(from: Date()), forHTTPHeader: HTTP.Header.date)
-        request.setValue(HTTP.MIMEType.json, forHTTPHeader: HTTP.Header.accept)
-        request.setValue(HTTP.MIMEType.json, forHTTPHeader: HTTP.Header.contentType)
+        request.setValue(Header.dateFormatter.string(from: Date()), forHeader: .date)
+        request.setValue(.json, forHeader: .accept)
+        request.setValue(.json, forHeader: .contentType)
         
         if let authorization = self.authorization {
-            request.setValue(authorization.headerValue, forHTTPHeader: HTTP.Header.authorization)
+            request.setValue(authorization.headerValue, forHeader: .authorization)
         }
         
         return request
@@ -150,6 +152,7 @@ public extension HTTPClient {
 
 #if swift(>=5.5) && canImport(ObjectiveC)
 @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
+@available(*, deprecated, message: "See 'Client' for more information.")
 public extension HTTPClient {
     func execute(request: URLRequest) async throws -> HTTP.AsyncDataTaskOutput {
         let sessionData = try await session.data(for: request)

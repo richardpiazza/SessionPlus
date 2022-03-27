@@ -4,10 +4,12 @@ import FoundationNetworking
 #endif
 
 /// Protocol used to extend an `HTTPClient` with support for injecting and retrieving canned responses.
+@available(*, deprecated, message: "See 'Client' for more information.")
 public protocol HTTPInjectable {
     var injectedResponses: [InjectedPath : InjectedResponse] { get set }
 }
 
+@available(*, deprecated, message: "See 'Client' for more information.")
 public extension HTTPInjectable where Self: HTTPClient {
     func execute(request: URLRequest, completion: @escaping HTTP.DataTaskCompletion) {
         let injectedPath = InjectedPath(request: request)
@@ -41,6 +43,7 @@ public extension HTTPInjectable where Self: HTTPClient {
 
 #if swift(>=5.5) && canImport(ObjectiveC)
 @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
+@available(*, deprecated, message: "See 'Client' for more information.")
 public extension HTTPInjectable where Self: HTTPClient {
     func execute(request: URLRequest) async throws -> HTTP.AsyncDataTaskOutput {
         let injectedPath = InjectedPath(request: request)
@@ -48,7 +51,7 @@ public extension HTTPInjectable where Self: HTTPClient {
             throw HTTP.Error.invalidResponse
         }
         
-        await Task.sleep(injectedResponse.timeout)
+        try await Task.sleep(nanoseconds: injectedResponse.timeout * 1000000000)
         switch injectedResponse.result {
         case .failure(let error):
             throw error
@@ -60,6 +63,7 @@ public extension HTTPInjectable where Self: HTTPClient {
 #endif
 
 /// A Hashable compound type based on the method and absolute path of a URLRequest.
+@available(*, deprecated, message: "See 'EmulatedClient.EmulatedResponse' for more information.")
 public struct InjectedPath: Hashable {
     var method: HTTP.RequestMethod = .get
     var absolutePath: String
@@ -68,11 +72,6 @@ public struct InjectedPath: Hashable {
         let method = HTTP.RequestMethod(stringLiteral: request.httpMethod ?? HTTP.RequestMethod.get.rawValue)
         let path = request.url?.absoluteString ?? ""
         self.init(method: method, absolutePath: path)
-    }
-    
-    @available(*, deprecated, renamed: "init(method:absolutePath:)")
-    public init(string: String) {
-        self.init(method: .get, absolutePath: string)
     }
     
     public init(method: HTTP.RequestMethod = .get, absolutePath: String) {
@@ -98,43 +97,12 @@ public struct InjectedPath: Hashable {
 }
 
 /// A response to provide for a pre-determined request.
+@available(*, deprecated, message: "See 'EmulatedClient.EmulatedResponse' for more information.")
 public struct InjectedResponse {
     public var statusCode: Int = 0
     public var headers: HTTP.Headers? = nil
     public var timeout: UInt64 = 0
     public var result: Result<Data, Error> = .failure(HTTP.Error.invalidResponse)
-    
-    @available(*, deprecated, renamed: "result")
-    public var data: Data? {
-        get {
-            if case let .success(data) = result {
-                return data
-            }
-            
-            return nil
-        }
-        set {
-            if let value = newValue {
-                result = .success(value)
-            }
-        }
-    }
-    
-    @available(*, deprecated, renamed: "result")
-    public var error: Error? {
-        get {
-            if case let .failure(error) = result {
-                return error
-            }
-            
-            return nil
-        }
-        set {
-            if let value = newValue {
-                result = .failure(value)
-            }
-        }
-    }
     
     public init() {
     }
@@ -144,14 +112,5 @@ public struct InjectedResponse {
         self.headers = headers
         self.timeout = timeout
         self.result = result
-    }
-    
-    @available(*, deprecated, renamed: "init(statusCode:headers:timeout:result:)")
-    public init(statusCode: Int, headers: HTTP.Headers? = nil, data: Data? = nil, error: Error? = nil, timeout: UInt64 = 0) {
-        self.statusCode = statusCode
-        self.headers = headers
-        self.data = data
-        self.error = error
-        self.timeout = timeout
     }
 }
