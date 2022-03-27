@@ -1,17 +1,15 @@
 import Foundation
 
-public extension HTTP {
-    /// MIME Types used in the API
-    struct MIMEType: ExpressibleByStringLiteral, Hashable {
-        public let rawValue: String
-        
-        public init(stringLiteral value: StringLiteralType) {
-            rawValue = value
-        }
+/// MIME Types used in the API
+public struct MIMEType: ExpressibleByStringLiteral, Hashable {
+    public let rawValue: String
+    
+    public init(stringLiteral value: StringLiteralType) {
+        rawValue = value
     }
 }
 
-extension HTTP.MIMEType: Codable {
+extension MIMEType: Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         rawValue = try container.decode(String.self)
@@ -23,15 +21,15 @@ extension HTTP.MIMEType: Codable {
     }
 }
 
-extension HTTP.MIMEType: Identifiable {
+extension MIMEType: Identifiable {
     public var id: String { rawValue }
 }
 
-extension HTTP.MIMEType: CustomStringConvertible {
+extension MIMEType: CustomStringConvertible {
     public var description: String { rawValue }
 }
 
-public extension HTTP.MIMEType {
+public extension MIMEType {
     /// Any kind of binary data
     static let bin: Self = "application/octet-stream"
     /// Graphics Interchange Format (GIF)

@@ -1,17 +1,15 @@
 import Foundation
 
-public extension HTTP {
-    /// Command HTTP Header
-    struct Header: ExpressibleByStringLiteral, Hashable {
-        public let rawValue: String
-        
-        public init(stringLiteral value: StringLiteralType) {
-            rawValue = value
-        }
+/// Command HTTP Header
+public struct Header: ExpressibleByStringLiteral, Hashable {
+    public let rawValue: String
+    
+    public init(stringLiteral value: StringLiteralType) {
+        rawValue = value
     }
 }
 
-extension HTTP.Header: Codable {
+extension Header: Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         rawValue = try container.decode(String.self)
@@ -23,15 +21,15 @@ extension HTTP.Header: Codable {
     }
 }
 
-extension HTTP.Header: Identifiable {
+extension Header: Identifiable {
     public var id: String { rawValue }
 }
 
-extension HTTP.Header: CustomStringConvertible {
+extension Header: CustomStringConvertible {
     public var description: String { rawValue }
 }
 
-public extension HTTP.Header {
+public extension Header {
     /// The Accept request HTTP header advertises which content types, expressed as MIME types, the client is able to understand.
     static let accept: Self = "Accept"
     /// The HTTP Authorization request header contains the credentials to authenticate a user agent with a server,

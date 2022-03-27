@@ -1,22 +1,20 @@
-public extension HTTP {
-    /// Status codes are issued by a server in response to a client's request made to the server.
-    ///
-    /// All HTTP response status codes are separated into five classes or categories:
-    /// * 1xx Informational: The request was received, continuing process.
-    /// * 2xx Success: The request was successfully received, understood, and accepted.
-    /// * 3xx Redirection: Further action needs to be taken in order to complete the request.
-    /// * 4xx Client Error: The request contains bad syntax or cannot be fulfilled.
-    /// * 5xx Server Error: The server failed to fulfill an apparently valid request.
-    struct StatusCode: ExpressibleByIntegerLiteral, Hashable {
-        public let rawValue: Int
-        
-        public init(integerLiteral value: IntegerLiteralType) {
-            rawValue = value
-        }
+/// Status codes are issued by a server in response to a client's request made to the server.
+///
+/// All HTTP response status codes are separated into five classes or categories:
+/// * 1xx Informational: The request was received, continuing process.
+/// * 2xx Success: The request was successfully received, understood, and accepted.
+/// * 3xx Redirection: Further action needs to be taken in order to complete the request.
+/// * 4xx Client Error: The request contains bad syntax or cannot be fulfilled.
+/// * 5xx Server Error: The server failed to fulfill an apparently valid request.
+public struct StatusCode: ExpressibleByIntegerLiteral, Hashable {
+    public let rawValue: Int
+    
+    public init(integerLiteral value: IntegerLiteralType) {
+        rawValue = value
     }
 }
 
-extension HTTP.StatusCode: Codable {
+extension StatusCode: Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         rawValue = try container.decode(Int.self)
@@ -28,19 +26,19 @@ extension HTTP.StatusCode: Codable {
     }
 }
 
-extension HTTP.StatusCode: Comparable {
-    public static func < (lhs: HTTP.StatusCode, rhs: HTTP.StatusCode) -> Bool { lhs.rawValue < rhs.rawValue }
+extension StatusCode: Comparable {
+    public static func < (lhs: StatusCode, rhs: StatusCode) -> Bool { lhs.rawValue < rhs.rawValue }
 }
 
-extension HTTP.StatusCode: Identifiable {
+extension StatusCode: Identifiable {
     public var id: Int { rawValue }
 }
 
-extension HTTP.StatusCode: CustomStringConvertible {
+extension StatusCode: CustomStringConvertible {
     public var description: String { "\(rawValue)" }
 }
 
-public extension HTTP.StatusCode {
+public extension StatusCode {
     // MARK: - Success
     
     /// **200** Standard response for successful HTTP requests.

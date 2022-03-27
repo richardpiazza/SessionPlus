@@ -49,8 +49,15 @@ public struct HTTP {
 }
 
 // The HTTP.* name-spacing will be removed in future versions of SessionPlus.
-public typealias Authorization = HTTP.Authorization
-public typealias Header = HTTP.Header
-public typealias MIMEType = HTTP.MIMEType
-public typealias Method = HTTP.RequestMethod
-public typealias StatusCode = HTTP.StatusCode
+public extension HTTP {
+    @available(*, deprecated, renamed: "Authorization")
+    typealias Authorization = SessionPlus.Authorization
+    @available(*, deprecated, renamed: "Header")
+    typealias Header = SessionPlus.Header
+    @available(*, deprecated, renamed: "MIMEType")
+    typealias MIMEType = SessionPlus.MIMEType
+    @available(*, deprecated, renamed: "Method")
+    typealias RequestMethod = Method
+    @available(*, deprecated, renamed: "StatusCode")
+    typealias StatusCode = SessionPlus.StatusCode
+}

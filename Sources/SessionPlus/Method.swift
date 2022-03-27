@@ -1,19 +1,17 @@
 import Foundation
 
-public extension HTTP {
-    /// Desired action to be performed for a given resource.
-    ///
-    /// Although they can also be nouns, these request methods are sometimes referred as HTTP verbs.
-    struct RequestMethod: ExpressibleByStringLiteral, Hashable {
-        public let rawValue: String
-        
-        public init(stringLiteral value: String) {
-            rawValue = value
-        }
+/// Desired action to be performed for a given resource.
+///
+/// Although they can also be nouns, these request methods are sometimes referred as HTTP verbs.
+public struct Method: ExpressibleByStringLiteral, Hashable {
+    public let rawValue: String
+    
+    public init(stringLiteral value: String) {
+        rawValue = value
     }
 }
 
-extension HTTP.RequestMethod: Codable {
+extension Method: Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         rawValue = try container.decode(String.self)
@@ -25,15 +23,15 @@ extension HTTP.RequestMethod: Codable {
     }
 }
 
-extension HTTP.RequestMethod: Identifiable {
+extension Method: Identifiable {
     public var id: String { rawValue }
 }
 
-extension HTTP.RequestMethod: CustomStringConvertible {
+extension Method: CustomStringConvertible {
     public var description: String { rawValue }
 }
 
-public extension HTTP.RequestMethod {
+public extension Method {
     /// The GET method requests a representation of the specified resource.
     ///
     /// Requests using GET should only retrieve data.

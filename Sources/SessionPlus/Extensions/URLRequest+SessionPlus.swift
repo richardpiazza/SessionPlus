@@ -42,7 +42,7 @@ public extension URLRequest {
     /// - parameters:
     ///   - value: The new value for the header field. Any existing value for the field is replaced by the new value.
     ///   - header: The header for which to set the value. (Headers are case sensitive)
-    mutating func setValue(_ value: HTTP.MIMEType, forHeader header: Header) {
+    mutating func setValue(_ value: MIMEType, forHeader header: Header) {
         self.setValue(value.rawValue, forHTTPHeaderField: header.rawValue)
     }
 }
