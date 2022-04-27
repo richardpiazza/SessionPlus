@@ -71,5 +71,6 @@ open class URLSessionClient: Client {
             let response = AnyResponse(statusCode: httpResponse.statusCode, headers: httpResponse.headers, data: data ?? Data())
             completion(.success(response))
         }
+        .resume()
     }
 }
