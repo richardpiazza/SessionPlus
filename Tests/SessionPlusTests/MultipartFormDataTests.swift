@@ -9,7 +9,7 @@ final class MultipartFormDataTests: XCTestCase {
     func testPNGImageFormDataRequest() throws {
         let imageData = try XCTUnwrap(Data(base64Encoded: imageBase64))
         
-        let request = PNGImageFormDataRequest(filename: filename, imageData: imageData)
+        let request = PNGImageFormDataRequest(path: "", filename: filename, imageData: imageData)
         let contentType = try XCTUnwrap(request.headers?[.contentType] as? String)
         let boundary = contentType.suffix(32)
         let body = try XCTUnwrap(request.body)

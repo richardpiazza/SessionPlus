@@ -6,14 +6,14 @@ open class EmulatedClient: Client {
     public struct EmulatedRequest: Request, Identifiable, Codable {
         
         enum CodingKeys: String, CodingKey {
-            case path
+            case address
             case method
             case headers
             case queryItems
             case body
         }
         
-        public var path: String
+        public var address: Address
         public var method: SessionPlus.Method
         public var headers: Headers?
         public var queryItems: [URLQueryItem]?
@@ -29,7 +29,7 @@ open class EmulatedClient: Client {
         }
         
         public init(_ request: Request) {
-            path = request.path
+            address = request.address
             method = request.method
             headers = request.headers
             queryItems = request.queryItems
@@ -38,7 +38,7 @@ open class EmulatedClient: Client {
         
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            path = try container.decode(String.self, forKey: .path)
+            address = try container.decode(Address.self, forKey: .address)
             method = try container.decode(Method.self, forKey: .method)
             headers = try container.decodeIfPresent([String: String].self, forKey: .headers)
             queryItems = try container.decodeIfPresent([URLQueryItem].self, forKey: .queryItems)
@@ -47,7 +47,7 @@ open class EmulatedClient: Client {
         
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(path, forKey: .path)
+            try container.encode(address, forKey: .address)
             try container.encode(method, forKey: .method)
             try container.encodeIfPresent(headers as? [String: String], forKey: .headers)
             try container.encodeIfPresent(queryItems, forKey: .queryItems)
