@@ -41,7 +41,7 @@ let package = Package(
 
 ```swift
 let url = URL(string: "https://api.agify.io")!
-let client = URLSessionClient(baseURL: url)
+let client = BaseURLSessionClient(baseURL: url)
 let request = Get(queryItems: [URLQueryItem(name: "name", value: "bob")])
 let response = try await client.request(request)
 ```
