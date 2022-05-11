@@ -7,7 +7,7 @@ import UIKit
 #endif
 
 /// A wrapper for `URLSession` similar to `WebAPI` for general purpose downloading of data and images.
-@available(*, deprecated, message: "This will be removed in future versions of SessionPlus.")
+@available(*, deprecated, message: "Use `AbsoluteURLSessionClient` with `URLSessionConfiguration.cachingElseLoad()`.")
 open class Downloader {
     
     public typealias DataCompletion = (_ statusCode: Int, _ responseData: Data?, _ error: Error?) -> Void

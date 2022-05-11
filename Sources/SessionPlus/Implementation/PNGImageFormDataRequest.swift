@@ -30,7 +30,7 @@ public struct PNGImageFormDataRequest: Request {
     }
     
     public init(
-        path: String = "",
+        path: String,
         method: Method = .post,
         headers: Headers? = nil,
         queryItems: [URLQueryItem]? = nil,
@@ -39,6 +39,27 @@ public struct PNGImageFormDataRequest: Request {
         imageData: Data
     ) {
         self.address = .path(path)
+        self.method = method
+        self.queryItems = queryItems
+        
+        let data = Self.data(field: field, filename: filename, imageData: imageData)
+        
+        var headers = headers ?? [:]
+        headers[.contentType] = "multipart/form-data; boundary=\(data.boundary)"
+        self.headers = headers
+        self.body = data.data
+    }
+    
+    public init(
+        url: URL,
+        method: Method = .post,
+        headers: Headers? = nil,
+        queryItems: [URLQueryItem]? = nil,
+        field: String = "image",
+        filename: String = "image.png",
+        imageData: Data
+    ) {
+        self.address = .absolute(url)
         self.method = method
         self.queryItems = queryItems
         

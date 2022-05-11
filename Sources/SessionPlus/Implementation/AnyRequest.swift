@@ -38,7 +38,7 @@ public struct AnyRequest: Request {
     }
     
     public init(
-        path: String = "",
+        path: String,
         method: Method = .get,
         headers: Headers? = nil,
         queryItems: [URLQueryItem]? = nil,
@@ -52,7 +52,7 @@ public struct AnyRequest: Request {
     }
     
     public init<E>(
-        path: String = "",
+        path: String,
         method: Method = .get,
         headers: Headers? = nil,
         queryItems: [URLQueryItem]? = nil,
@@ -60,6 +60,35 @@ public struct AnyRequest: Request {
         using encoder: JSONEncoder = JSONEncoder()
     ) throws where E: Encodable {
         self.address = .path(path)
+        self.method = method
+        self.headers = headers
+        self.queryItems = queryItems
+        self.body = try encoder.encode(encoding)
+    }
+    
+    public init(
+        url: URL,
+        method: Method = .get,
+        headers: Headers? = nil,
+        queryItems: [URLQueryItem]? = nil,
+        body: Data? = nil
+    ) {
+        self.address = .absolute(url)
+        self.method = method
+        self.headers = headers
+        self.queryItems = queryItems
+        self.body = body
+    }
+    
+    public init<E>(
+        url: URL,
+        method: Method = .get,
+        headers: Headers? = nil,
+        queryItems: [URLQueryItem]? = nil,
+        encoding: E,
+        using encoder: JSONEncoder = JSONEncoder()
+    ) throws where E: Encodable {
+        self.address = .absolute(url)
         self.method = method
         self.headers = headers
         self.queryItems = queryItems

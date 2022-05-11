@@ -34,7 +34,7 @@ public struct Delete: Request {
     }
     
     public init(
-        path: String = "",
+        path: String,
         headers: Headers? = nil,
         queryItems: [URLQueryItem]? = nil,
         body: Data? = nil
@@ -46,13 +46,38 @@ public struct Delete: Request {
     }
     
     public init<E>(
-        path: String = "",
+        path: String,
         headers: Headers? = nil,
         queryItems: [URLQueryItem]? = nil,
         encoding: E,
         using encoder: JSONEncoder = JSONEncoder()
     ) throws where E: Encodable {
         self.address = .path(path)
+        self.headers = headers
+        self.queryItems = queryItems
+        self.body = try encoder.encode(encoding)
+    }
+    
+    public init(
+        url: URL,
+        headers: Headers? = nil,
+        queryItems: [URLQueryItem]? = nil,
+        body: Data? = nil
+    ) {
+        self.address = .absolute(url)
+        self.headers = headers
+        self.queryItems = queryItems
+        self.body = body
+    }
+    
+    public init<E>(
+        url: URL,
+        headers: Headers? = nil,
+        queryItems: [URLQueryItem]? = nil,
+        encoding: E,
+        using encoder: JSONEncoder = JSONEncoder()
+    ) throws where E: Encodable {
+        self.address = .absolute(url)
         self.headers = headers
         self.queryItems = queryItems
         self.body = try encoder.encode(encoding)

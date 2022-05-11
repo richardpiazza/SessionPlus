@@ -6,7 +6,11 @@ import FoundationNetworking
 import Combine
 #endif
 
-open class URLSessionClient: Client {
+@available(*, deprecated, renamed: "BaseURLSessionClient")
+public typealias URLSessionClient = BaseURLSessionClient
+
+/// A `Client` implementation that operates with a _base_ URL which all requests use to form the address.
+open class BaseURLSessionClient: Client {
     
     open var baseURL: URL
     public let session: URLSession

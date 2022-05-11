@@ -15,25 +15,25 @@ public protocol Request {
     var queryItems: [URLQueryItem]? { get }
     /// Binary data that is attached to the `URLRequest`.
     var body: Data? { get }
-    
-    /// Instructs the request to create an 'absolute' URL given a particular base/root `URL`.
-    func url(using baseURL: URL?) throws -> URL
 }
 
 public extension Request {
     /// Routing path extension.
     ///
     /// This is appended to a _base URL_ instance to create an 'absolute path' to a resource.
-    @available(*, deprecated, renamed: "address")
     var path: String {
-        guard case let .path(path) = address else {
-            return ""
+        switch address {
+        case .absolute(let url):
+            return URLComponents(url: url, resolvingAgainstBaseURL: false)?.path ?? ""
+        case .path(let path):
+            return path
         }
-        
-        return path
     }
     
+    /// Instructs the request to create an 'absolute' URL given a particular base/root `URL`.
+    ///
     /// The default implementation appends the `path` and any `queryItems`.
+    @available(*, deprecated, message: "URLRequest(request:baseUrl:) should be used directly.")
     func url(using baseURL: URL? = nil) throws -> URL {
         switch address {
         case .absolute(let url):
