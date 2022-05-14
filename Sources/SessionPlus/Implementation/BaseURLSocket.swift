@@ -19,8 +19,27 @@ open class BaseURLSocket: NSObject, Socket {
     /// - parameters:
     ///   - baseURL: The root **WebSocket** url path.
     ///   - keepAliveInterval: Number of seconds between ping/pong signals. (0=disabled)
-    public init(baseURL: URL, keepAliveInterval: Double = 15.0) {
-        self.baseURL = baseURL
+    public init(baseURL: URL, keepAliveInterval: Double = 15.0) throws {
+        guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
+            throw URLError(.badURL)
+        }
+        
+        switch components.scheme?.lowercased() {
+        case "ws", "wss":
+            break
+        case "http":
+            components.scheme = "ws"
+        case "https":
+            components.scheme = "wss"
+        default:
+            throw URLError(.unsupportedURL)
+        }
+        
+        guard let url = components.url else {
+            throw URLError(.badURL)
+        }
+        
+        self.baseURL = url
         self.keepAliveInterval = keepAliveInterval
         super.init()
     }
