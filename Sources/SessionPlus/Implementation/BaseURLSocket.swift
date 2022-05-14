@@ -46,14 +46,7 @@ open class BaseURLSocket: NSObject, Socket {
     
     public func start() -> AsyncThrowingStream<WebSocket.Message, Error> {
         messageSequence = .init()
-        
-        task.receive { [weak self] result in
-            self?.handleReceive(result)
-        }
         task.resume()
-        
-        keepAlive()
-        
         return messageSequence.stream
     }
     
@@ -134,6 +127,12 @@ extension BaseURLSocket: URLSessionTaskDelegate {
 extension BaseURLSocket: URLSessionWebSocketDelegate {
     public func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didOpenWithProtocol protocol: String?) {
         print("WebSocket Opened; Protocol: \(`protocol` ?? "")]")
+        
+        task.receive { [weak self] result in
+            self?.handleReceive(result)
+        }
+        
+        keepAlive()
     }
     
     public func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, closeReason: Data?) {
