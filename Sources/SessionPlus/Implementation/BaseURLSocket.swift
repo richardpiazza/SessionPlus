@@ -19,7 +19,7 @@ open class BaseURLSocket: NSObject, Socket {
     /// - parameters:
     ///   - baseURL: The root **WebSocket** url path.
     ///   - keepAliveInterval: Number of seconds between ping/pong signals. (0=disabled)
-    public init(baseURL: URL, keepAliveInterval: Double = 30.0) {
+    public init(baseURL: URL, keepAliveInterval: Double = 15.0) {
         self.baseURL = baseURL
         self.keepAliveInterval = keepAliveInterval
         super.init()
@@ -46,16 +46,7 @@ open class BaseURLSocket: NSObject, Socket {
     
     public func send(_ message: WebSocket.Message) async throws {
         let taskMessage = URLSessionWebSocketTask.Message(message)
-        
-        try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<Void, Error>) in
-            task.send(taskMessage) { error in
-                if let error = error {
-                    continuation.resume(throwing: error)
-                } else {
-                    continuation.resume()
-                }
-            }
-        })
+        try await task.send(taskMessage)
     }
     
     private func keepAlive() {
@@ -92,21 +83,33 @@ open class BaseURLSocket: NSObject, Socket {
         switch result {
         case .failure(let error):
             messageSequence.finish(throwing: error)
+            
+            stop()
         case .success(let message):
             let message = WebSocket.Message(message)
             messageSequence.yield(message)
-        }
-        
-        // Oddity of the `URLSessionWebSocketTask` implementation. Requires re-assignment of the
-        // 'receive' completion to read the next full result.
-        task.receive { [weak self] result in
-            self?.handleReceive(result)
+            
+            // Oddity of the `URLSessionWebSocketTask` implementation. Requires re-assignment of the
+            // 'receive' completion to read the next full result.
+            task.receive { [weak self] result in
+                self?.handleReceive(result)
+            }
         }
     }
 }
 
 extension BaseURLSocket: URLSessionDelegate {
     
+}
+
+extension BaseURLSocket: URLSessionTaskDelegate {
+    public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        guard error != nil else {
+            return
+        }
+        
+        stop()
+    }
 }
 
 extension BaseURLSocket: URLSessionWebSocketDelegate {
