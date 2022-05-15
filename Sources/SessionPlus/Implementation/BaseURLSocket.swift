@@ -71,7 +71,7 @@ open class BaseURLSocket: NSObject, Socket {
     public func stop() {
         keepAliveTask?.cancel()
         task.cancel(with: .normalClosure, reason: nil)
-        session.finishTasksAndInvalidate()
+        session.invalidateAndCancel()
     }
     
     public func send(_ message: WebSocket.Message) async throws {
@@ -86,6 +86,8 @@ open class BaseURLSocket: NSObject, Socket {
     
     private func resume(with handler: @escaping ResumeHandler) {
         resumeHandler = handler
+        session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
+        task = session.webSocketTask(with: urlRequest)
         task.resume()
     }
     
@@ -99,7 +101,17 @@ open class BaseURLSocket: NSObject, Socket {
         keepAliveTask = Task {
             do {
                 try await Task.sleep(nanoseconds: UInt64(keepAliveInterval * 1_000_000_000))
+                
+                guard !Task.isCancelled else {
+                    return
+                }
+                
                 try await ping()
+                
+                guard !Task.isCancelled else {
+                    return
+                }
+                
                 keepAlive()
             } catch {
                 print(error)
