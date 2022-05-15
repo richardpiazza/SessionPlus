@@ -56,6 +56,7 @@ open class BaseURLSocket: NSObject, Socket {
     }
     
     public func start() async throws {
+        print(#function)
         try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<Void, Error>) in
             resume { result in
                 switch result {
@@ -69,22 +70,26 @@ open class BaseURLSocket: NSObject, Socket {
     }
     
     public func stop() {
+        print(#function)
         keepAliveTask?.cancel()
         task.cancel(with: .normalClosure, reason: nil)
         session.invalidateAndCancel()
     }
     
     public func send(_ message: WebSocket.Message) async throws {
+        print(#function)
         let taskMessage = URLSessionWebSocketTask.Message(message)
         try await task.send(taskMessage)
     }
     
     public func receive() -> AsyncThrowingStream<WebSocket.Message, Error> {
+        print(#function)
         messageSequence = .init()
         return messageSequence.stream
     }
     
     private func resume(with handler: @escaping ResumeHandler) {
+        print(#function)
         resumeHandler = handler
         session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
         task = session.webSocketTask(with: urlRequest)
@@ -97,21 +102,13 @@ open class BaseURLSocket: NSObject, Socket {
         }
         
         keepAliveTask?.cancel()
-        
+        print(#function)
         keepAliveTask = Task {
             do {
                 try await Task.sleep(nanoseconds: UInt64(keepAliveInterval * 1_000_000_000))
-                
-                guard !Task.isCancelled else {
-                    return
-                }
-                
+                try Task.checkCancellation()
                 try await ping()
-                
-                guard !Task.isCancelled else {
-                    return
-                }
-                
+                try Task.checkCancellation()
                 keepAlive()
             } catch {
                 print(error)
@@ -120,6 +117,7 @@ open class BaseURLSocket: NSObject, Socket {
     }
     
     private func ping() async throws {
+        print(#function)
         try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<Void, Error>) in
             task.sendPing { error in
                 if let error = error {
