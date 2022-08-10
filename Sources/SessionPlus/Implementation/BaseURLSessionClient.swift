@@ -20,11 +20,10 @@ open class BaseURLSessionClient: Client {
         self.session = URLSession(configuration: sessionConfiguration, delegate: sessionDelegate, delegateQueue: nil)
     }
     
-    #if swift(>=5.5.2) && (os(macOS) || os(iOS) || os(tvOS) || os(watchOS))
+    #if (os(macOS) || os(iOS) || os(tvOS) || os(watchOS))
     /// Implementation that uses the `URLSession` async/await concurrency apis for handling a `Request`/`Response` interaction.
     ///
     /// The `URLSession` api is only available on Apple platforms, as the `FoundationNetworking` version has not been updated.
-    @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
     public func performRequest(_ request: Request) async throws -> Response {
         let urlRequest = try URLRequest(request: request, baseUrl: baseURL)
         let sessionResponse = try await session.data(for: urlRequest)
