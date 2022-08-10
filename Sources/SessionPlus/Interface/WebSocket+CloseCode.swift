@@ -57,8 +57,10 @@ extension WebSocket.CloseCode: CustomStringConvertible {
     }
 }
 
+#if canImport(ObjectiveC)
 public extension WebSocket.CloseCode {
     init(_ closeCode: URLSessionWebSocketTask.CloseCode) {
         self = Self.allCases.first(where: { $0.rawValue == closeCode.rawValue }) ?? .invalid
     }
 }
+#endif

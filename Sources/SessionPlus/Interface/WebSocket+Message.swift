@@ -10,6 +10,7 @@ public extension WebSocket {
     }
 }
 
+#if canImport(ObjectiveC)
 public extension WebSocket.Message {
     init(_ message: URLSessionWebSocketTask.Message) {
         switch message {
@@ -33,3 +34,4 @@ public extension URLSessionWebSocketTask.Message {
         }
     }
 }
+#endif

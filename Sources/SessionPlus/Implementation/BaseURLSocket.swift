@@ -3,6 +3,7 @@ import AsyncPlus
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
+#if canImport(ObjectiveC)
 
 open class BaseURLSocket: NSObject, Socket {
     
@@ -202,3 +203,4 @@ extension BaseURLSocket: URLSessionWebSocketDelegate {
         }
     }
 }
+#endif
