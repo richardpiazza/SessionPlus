@@ -5,7 +5,7 @@ import FoundationNetworking
 #endif
 #if canImport(ObjectiveC)
 
-open class BaseURLSocket: NSObject, Socket {
+open class AbsoluteURLWebSocket: NSObject, WebSocket {
     
     private typealias ResumeHandler = (Result<Void, Error>) -> Void
     
@@ -17,7 +17,7 @@ open class BaseURLSocket: NSObject, Socket {
     lazy var task = session.webSocketTask(with: urlRequest)
     
     private var keepAliveTask: Task<Void, Never>?
-    private var messageSequence: PassthroughAsyncThrowingSequence<WebSocket.Message> = .init()
+    private var messageSequence: PassthroughAsyncThrowingSequence<Socket.Message> = .init()
     private var resumeHandler: ResumeHandler?
     private var pingContinuation: CheckedContinuation<Void, Error>?
     
@@ -80,12 +80,12 @@ open class BaseURLSocket: NSObject, Socket {
         session.invalidateAndCancel()
     }
     
-    public func send(_ message: WebSocket.Message) async throws {
+    public func send(_ message: Socket.Message) async throws {
         let taskMessage = URLSessionWebSocketTask.Message(message)
         try await task.send(taskMessage)
     }
     
-    public func receive() -> AsyncThrowingStream<WebSocket.Message, Error> {
+    public func receive() -> AsyncThrowingStream<Socket.Message, Error> {
         messageSequence = .init()
         return messageSequence.stream
     }
@@ -140,7 +140,7 @@ open class BaseURLSocket: NSObject, Socket {
             
             stop()
         case .success(let message):
-            let message = WebSocket.Message(message)
+            let message = Socket.Message(message)
             messageSequence.yield(message)
             
             // Oddity of the `URLSessionWebSocketTask` implementation. Requires re-assignment of the
@@ -152,11 +152,11 @@ open class BaseURLSocket: NSObject, Socket {
     }
 }
 
-extension BaseURLSocket: URLSessionDelegate {
+extension AbsoluteURLWebSocket: URLSessionDelegate {
     
 }
 
-extension BaseURLSocket: URLSessionTaskDelegate {
+extension AbsoluteURLWebSocket: URLSessionTaskDelegate {
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         guard let error = error else {
             return
@@ -169,7 +169,7 @@ extension BaseURLSocket: URLSessionTaskDelegate {
     }
 }
 
-extension BaseURLSocket: URLSessionWebSocketDelegate {
+extension AbsoluteURLWebSocket: URLSessionWebSocketDelegate {
     public func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didOpenWithProtocol protocol: String?) {
         print("WebSocket Opened; Protocol: '\(`protocol` ?? "")'")
         resumeHandler?(.success(()))
@@ -183,7 +183,7 @@ extension BaseURLSocket: URLSessionWebSocketDelegate {
     }
     
     public func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, closeReason: Data?) {
-        let code = WebSocket.CloseCode(closeCode)
+        let code = Socket.CloseCode(closeCode)
         let reason = String(data: closeReason ?? Data(), encoding: .utf8) ?? ""
         
         if code == .normalClosure {
