@@ -76,15 +76,3 @@ public extension URLRequest {
         self.setValue(value.rawValue, forHTTPHeaderField: header.rawValue)
     }
 }
-
-public extension URLRequest {
-    @available(*, deprecated, renamed: "setValue(_:forHeader:)")
-    mutating func setValue(_ value: String, forHTTPHeader header: Header) {
-        setValue(value, forHeader: header)
-    }
-    
-    @available(*, deprecated, renamed: "setValue(_:forHeader:)")
-    mutating func setValue(_ value: HTTP.MIMEType, forHTTPHeader header: Header) {
-        setValue(value.rawValue, forHeader: header)
-    }
-}

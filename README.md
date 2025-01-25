@@ -2,38 +2,10 @@
 
 A swift _request & response_ framework for JSON apis.
 
-<p>
- <img src="https://github.com/richardpiazza/SessionPlus/workflows/Swift/badge.svg?branch=main" />
- <img src="https://img.shields.io/badge/Swift-5.6-orange.svg" />
- <a href="https://twitter.com/richardpiazza">
- <img src="https://img.shields.io/badge/twitter-@richardpiazza-blue.svg?style=flat" alt="Twitter: @richardpiazza" />
- </a>
-</p>
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Frichardpiazza%2FSessionPlus%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/richardpiazza/SessionPlus)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Frichardpiazza%2FSessionPlus%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/richardpiazza/SessionPlus)
 
 This package has been designed to work across multiple swift environments by utilizing conditional checks. It has been tested on Apple platforms (macOS, iOS, tvOS, watchOS), as well as Linux (Ubuntu).
-
-## Installation
-
-**SessionPlus** is distributed using the [Swift Package Manager](https://swift.org/package-manager). 
-You can add it using Xcode or by listing it as a dependency in your `Package.swift` manifest:
-
-```swift
-let package = Package(
-  ...
-  dependencies: [
-    .package(url: "https://github.com/richardpiazza/SessionPlus.git", .upToNextMajor(from: "2.0.0")
-  ],
-  ...
-  targets: [
-    .target(
-      name: "MyPackage",
-      dependnecies: [
-        "SessionPlus"
-      ]
-    )
-  ]
-)
-```
 
 ## Usage
 
@@ -74,6 +46,29 @@ func performRequest(_ request: Request) async throws -> Response
 func performRequest(_ request: Request, completion: @escaping (Result<Response, Error>) -> Void)
 // Combine publisher that emits with a response
 func performRequest(_ request: Request) -> AnyPublisher<Response, Error>
+```
+
+## Installation
+
+**SessionPlus** is distributed using the [Swift Package Manager](https://swift.org/package-manager). 
+You can add it using Xcode or by listing it as a dependency in your `Package.swift` manifest:
+
+```swift
+let package = Package(
+  ...
+  dependencies: [
+    .package(url: "https://github.com/richardpiazza/SessionPlus.git", .upToNextMajor(from: "2.0.0")
+  ],
+  ...
+  targets: [
+    .target(
+      name: "MyPackage",
+      dependnecies: [
+        "SessionPlus"
+      ]
+    )
+  ]
+)
 ```
 
 ## Contribution
