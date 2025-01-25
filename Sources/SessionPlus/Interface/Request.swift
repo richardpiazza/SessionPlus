@@ -30,39 +30,6 @@ public extension Request {
         }
     }
     
-    /// Instructs the request to create an 'absolute' URL given a particular base/root `URL`.
-    ///
-    /// The default implementation appends the `path` and any `queryItems`.
-    @available(*, deprecated, message: "URLRequest(request:baseUrl:) should be used directly.")
-    func url(using baseURL: URL? = nil) throws -> URL {
-        switch address {
-        case .absolute(let url):
-            return url
-        case .path(let path):
-            guard let baseURL = baseURL else {
-                throw URLError(.badURL)
-            }
-            
-            let pathUrl = baseURL.appendingPathComponent(path)
-            
-            guard let queryItems = self.queryItems else {
-                return pathUrl
-            }
-            
-            guard var components = URLComponents(url: pathUrl, resolvingAgainstBaseURL: false) else {
-                throw URLError(.badURL)
-            }
-            
-            components.queryItems = queryItems
-            
-            guard let url = components.url else {
-                throw URLError(.badURL)
-            }
-            
-            return url
-        }
-    }
-    
     /// Appends (or overwrites) the **Authorization** key in the request headers.
     ///
     /// - parameters:

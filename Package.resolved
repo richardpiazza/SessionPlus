@@ -1,16 +1,14 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "AsyncPlus",
-        "repositoryURL": "https://github.com/richardpiazza/AsyncPlus.git",
-        "state": {
-          "branch": null,
-          "revision": "be7aad849d2ead0196aee1c296f52ef2e016fcf5",
-          "version": "0.1.0"
-        }
+  "pins" : [
+    {
+      "identity" : "asyncplus",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/richardpiazza/AsyncPlus.git",
+      "state" : {
+        "revision" : "ab486f6744539f8814296cc85a7cc317f165dfc0",
+        "version" : "0.3.2"
       }
-    ]
-  },
-  "version": 1
+    }
+  ],
+  "version" : 2
 }
