@@ -18,7 +18,7 @@ open class BaseURLSessionClient: Client {
         let urlRequest = try URLRequest(request: request, baseUrl: baseURL)
         
         #if canImport(FoundationNetworking)
-        let sessionResponse = try await withCheckedThrowingContinuation { continuation in
+        let sessionResponse = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(Data, URLResponse), Error>) in
             session.dataTask(with: urlRequest) { data, urlResponse, error in
                 if let error {
                     continuation.resume(throwing: error)
