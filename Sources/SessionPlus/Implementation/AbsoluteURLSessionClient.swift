@@ -2,9 +2,6 @@ import Foundation
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
-#if canImport(Combine)
-import Combine
-#endif
 
 /// A `Client` implementation that operates expecting all requests use _absolute_ urls.
 open class AbsoluteURLSessionClient: Client {
@@ -15,60 +12,31 @@ open class AbsoluteURLSessionClient: Client {
         self.session = URLSession(configuration: sessionConfiguration, delegate: sessionDelegate, delegateQueue: nil)
     }
     
-    #if (os(macOS) || os(iOS) || os(tvOS) || os(watchOS))
-    /// Implementation that uses the `URLSession` async/await concurrency apis for handling a `Request`/`Response` interaction.
-    ///
-    /// The `URLSession` api is only available on Apple platforms, as the `FoundationNetworking` version has not been updated.
-    public func performRequest(_ request: Request) async throws -> Response {
+    public func performRequest(_ request: any Request) async throws -> any Response {
         let urlRequest = try URLRequest(request: request)
+        
+        #if canImport(FoundationNetworking)
+        let sessionResponse = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(Data, URLResponse), Error>) in
+            session.dataTask(with: urlRequest) { data, urlResponse, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                continuation.resume(returning: (data!, urlResponse!))
+            }
+            .resume()
+        }
+        #else
         let sessionResponse = try await session.data(for: urlRequest)
-        return AnyResponse(statusCode: sessionResponse.1.statusCode, headers: sessionResponse.1.headers, data: sessionResponse.0)
-    }
-    #endif
-    
-    #if canImport(Combine)
-    /// Implementation that uses the `URLSession.DataTaskPublisher` to handle the `Request`/`Response` interaction.
-    public func performRequest(_ request: Request) -> AnyPublisher<Response, Error> {
-        let urlRequest: URLRequest
-        do {
-            urlRequest = try URLRequest(request: request)
-        } catch {
-            return Fail(outputType: Response.self, failure: error).eraseToAnyPublisher()
-        }
+        #endif
         
-        return session
-            .dataTaskPublisher(for: urlRequest)
-            .tryMap { taskResponse -> Response in
-                AnyResponse(statusCode: taskResponse.response.statusCode, headers: taskResponse.response.headers, data: taskResponse.data)
-            }
-            .eraseToAnyPublisher()
-    }
-    #endif
-    
-    /// Implementation that uses the default `URLSessionDataTask` methods for handling a `Request`/`Response` interaction.
-    public func performRequest(_ request: Request, completion: @escaping (Result<Response, Error>) -> Void) {
-        let urlRequest: URLRequest
-        do {
-            urlRequest = try URLRequest(request: request)
-        } catch {
-            completion(.failure(error))
-            return
-        }
+        let response = AnyResponse(
+            statusCode: sessionResponse.1.statusCode,
+            headers: sessionResponse.1.headers,
+            data: sessionResponse.0
+        )
         
-        session.dataTask(with: urlRequest) { data, urlResponse, error in
-            guard error == nil else {
-                completion(.failure(error!))
-                return
-            }
-            
-            guard let httpResponse = urlResponse else {
-                completion(.failure(URLError(.cannotParseResponse)))
-                return
-            }
-            
-            let response = AnyResponse(statusCode: httpResponse.statusCode, headers: httpResponse.headers, data: data ?? Data())
-            completion(.success(response))
-        }
-        .resume()
+        return response
     }
 }

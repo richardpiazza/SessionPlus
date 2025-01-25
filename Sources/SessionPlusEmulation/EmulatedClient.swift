@@ -82,13 +82,17 @@ open class EmulatedClient: Client {
         responseCache[emulatedRequest.id] = .failure(error)
     }
     
-    public func performRequest(_ request: Request, completion: @escaping (Result<Response, Error>) -> Void) {
+    public func performRequest(_ request: any Request) async throws -> any Response {
         let id = EmulatedRequest(request).id
         guard let result = responseCache[id] else {
-            completion(.failure(NotFound()))
-            return
+            throw NotFound()
         }
         
-        completion(result)
+        switch result {
+        case .success(let response):
+            return response
+        case .failure(let error):
+            throw error
+        }
     }
 }
