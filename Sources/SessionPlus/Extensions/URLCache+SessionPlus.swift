@@ -8,22 +8,22 @@ public extension URLCache {
         case bytes(Int)
         case megabytes(Int)
         case gigabytes(Int)
-        
+
         public static var twentyFiveMB: Capacity = .megabytes(25)
         public static var twoHundredMB: Capacity = .megabytes(200)
-        
+
         public var bytes: Int {
             switch self {
             case .bytes(let value):
-                return value
+                value
             case .megabytes(let value):
-                return value * (1024 * 1024)
+                value * (1024 * 1024)
             case .gigabytes(let value):
-                return value * (1024 * 1024 * 1024)
+                value * (1024 * 1024 * 1024)
             }
         }
     }
-    
+
     convenience init(memoryCapacity: Capacity = .twentyFiveMB, diskCapacity: Capacity = .twoHundredMB) {
         #if canImport(FoundationNetworking)
         self.init(memoryCapacity: memoryCapacity.bytes, diskCapacity: diskCapacity.bytes, diskPath: "SessionPlusCache")

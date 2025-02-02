@@ -3,7 +3,7 @@ import Foundation
 /// MIME Types used in the API
 public struct MIMEType: ExpressibleByStringLiteral, Hashable {
     public let rawValue: String
-    
+
     public init(stringLiteral value: StringLiteralType) {
         rawValue = value
     }
@@ -14,7 +14,7 @@ extension MIMEType: Codable {
         let container = try decoder.singleValueContainer()
         rawValue = try container.decode(String.self)
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(rawValue)

@@ -4,15 +4,15 @@ import Foundation
 public struct AnyResponse: Response {
     public let statusCode: StatusCode
     public let headers: Headers
-    public let data: Data
-    
+    public let body: Data
+
     public init(
         statusCode: StatusCode = .ok,
         headers: Headers = [:],
-        data: Data = Data()
+        body: Data = Data()
     ) {
         self.statusCode = statusCode
         self.headers = headers
-        self.data = data
+        self.body = body
     }
 }

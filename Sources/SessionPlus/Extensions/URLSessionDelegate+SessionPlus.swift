@@ -15,14 +15,14 @@ public class SelfSignedSessionDelegate: NSObject, URLSessionDelegate {
             completionHandler(.cancelAuthenticationChallenge, nil)
             return
         }
-        
+
         var credentials: URLCredential?
         if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust {
             if let serverTrust = challenge.protectionSpace.serverTrust {
                 credentials = URLCredential(trust: serverTrust)
             }
         }
-        
+
         completionHandler(.useCredential, credentials)
     }
 }

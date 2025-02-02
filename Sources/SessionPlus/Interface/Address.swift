@@ -12,3 +12,12 @@ public enum Address: Codable {
     /// This is appended to a _base URL_ instance to create an 'absolute path' to a resource.
     case path(String)
 }
+
+extension Address: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .absolute(let url): url.absoluteString
+        case .path(let path): path
+        }
+    }
+}

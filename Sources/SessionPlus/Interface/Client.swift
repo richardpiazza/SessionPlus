@@ -1,6 +1,9 @@
 import Foundation
+import Logging
 
 public protocol Client {
+    var verboseLogging: Bool { get set }
+
     /// Perform a network `Request`.
     ///
     /// - parameters:
@@ -18,6 +21,6 @@ public extension Client {
     /// - returns: The decoded `Response` value.
     func performRequest<Value>(_ request: any Request, using decoder: JSONDecoder = JSONDecoder()) async throws -> Value where Value: Decodable {
         let response = try await performRequest(request)
-        return try decoder.decode(Value.self, from: response.data)
+        return try decoder.decode(Value.self, from: response.body)
     }
 }

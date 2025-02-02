@@ -2,6 +2,7 @@ import Foundation
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
+import Logging
 
 /// The encapsulation of information needed to perform a request against an HTTP/REST service endpoint.
 public protocol Request {
@@ -12,7 +13,7 @@ public protocol Request {
     /// Custom headers to provide in the created `URLRequest`.
     var headers: Headers? { get }
     /// Additional components that will be appended to the created `URL`.
-    var queryItems: [URLQueryItem]? { get }
+    var queryItems: [QueryItem]? { get }
     /// Binary data that is attached to the `URLRequest`.
     var body: Data? { get }
 }
@@ -24,21 +25,48 @@ public extension Request {
     var path: String {
         switch address {
         case .absolute(let url):
-            return URLComponents(url: url, resolvingAgainstBaseURL: false)?.path ?? ""
+            URLComponents(url: url, resolvingAgainstBaseURL: false)?.path ?? ""
         case .path(let path):
-            return path
+            path
         }
     }
-    
+
     /// Appends (or overwrites) the **Authorization** key in the request headers.
     ///
     /// - parameters:
     ///   - token: The token which should be used for authentication.
     /// - returns: A modified `Request` that includes an authentication value.
     func authorized(_ authorization: Authorization) -> Request {
-        var headers = self.headers ?? [:]
+        var headers = headers ?? [:]
         headers[.authorization] = authorization.headerValue
-        
-        return AnyRequest(address: address, method: method, headers: headers, queryItems: queryItems, body: body)
+
+        return AnyRequest(
+            address: address,
+            method: method,
+            headers: headers,
+            queryItems: queryItems,
+            body: body
+        )
+    }
+}
+
+extension Request {
+    var metadata: Logger.Metadata {
+        [
+            "address": .stringConvertible(address),
+            "method": .stringConvertible(method),
+            "bytes": .stringConvertible((body ?? Data()).count),
+        ]
+    }
+
+    var verboseMetadata: Logger.Metadata {
+        [
+            "address": .stringConvertible(address),
+            "method": .stringConvertible(method),
+            "bytes": .stringConvertible((body ?? Data()).count),
+            "body": .string(String(decoding: body ?? Data(), as: UTF8.self)),
+            "headers": .dictionary((headers ?? [:]).metadata),
+            "queryItems": .dictionary((queryItems ?? []).metadata),
+        ]
     }
 }
