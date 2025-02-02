@@ -5,7 +5,7 @@ import Foundation
 /// Although they can also be nouns, these request methods are sometimes referred as HTTP verbs.
 public struct Method: ExpressibleByStringLiteral, Hashable {
     public let rawValue: String
-    
+
     public init(stringLiteral value: String) {
         rawValue = value
     }
@@ -16,7 +16,7 @@ extension Method: Codable {
         let container = try decoder.singleValueContainer()
         rawValue = try container.decode(String.self)
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(rawValue)

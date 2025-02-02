@@ -5,14 +5,14 @@ public struct AnyRequest: Request {
     public let address: Address
     public let method: Method
     public let headers: Headers?
-    public let queryItems: [URLQueryItem]?
+    public let queryItems: [QueryItem]?
     public let body: Data?
-    
+
     public init(
         address: Address = .path(""),
         method: Method = .get,
         headers: Headers? = nil,
-        queryItems: [URLQueryItem]? = nil,
+        queryItems: [QueryItem]? = nil,
         body: Data? = nil
     ) {
         self.address = address
@@ -21,77 +21,77 @@ public struct AnyRequest: Request {
         self.queryItems = queryItems
         self.body = body
     }
-    
-    public init<E>(
+
+    public init(
         address: Address = .path(""),
         method: Method = .get,
         headers: Headers? = nil,
-        queryItems: [URLQueryItem]? = nil,
-        encoding: E,
+        queryItems: [QueryItem]? = nil,
+        encoding: some Encodable,
         using encoder: JSONEncoder = JSONEncoder()
-    ) throws where E: Encodable {
+    ) throws {
         self.address = address
         self.method = method
         self.headers = headers
         self.queryItems = queryItems
-        self.body = try encoder.encode(encoding)
+        body = try encoder.encode(encoding)
     }
-    
+
     public init(
         path: String,
         method: Method = .get,
         headers: Headers? = nil,
-        queryItems: [URLQueryItem]? = nil,
+        queryItems: [QueryItem]? = nil,
         body: Data? = nil
     ) {
-        self.address = .path(path)
+        address = .path(path)
         self.method = method
         self.headers = headers
         self.queryItems = queryItems
         self.body = body
     }
-    
-    public init<E>(
+
+    public init(
         path: String,
         method: Method = .get,
         headers: Headers? = nil,
-        queryItems: [URLQueryItem]? = nil,
-        encoding: E,
+        queryItems: [QueryItem]? = nil,
+        encoding: some Encodable,
         using encoder: JSONEncoder = JSONEncoder()
-    ) throws where E: Encodable {
-        self.address = .path(path)
+    ) throws {
+        address = .path(path)
         self.method = method
         self.headers = headers
         self.queryItems = queryItems
-        self.body = try encoder.encode(encoding)
+        body = try encoder.encode(encoding)
     }
-    
+
     public init(
         url: URL,
         method: Method = .get,
         headers: Headers? = nil,
-        queryItems: [URLQueryItem]? = nil,
+        queryItems: [QueryItem]? = nil,
         body: Data? = nil
     ) {
-        self.address = .absolute(url)
+        address = .absolute(url)
         self.method = method
         self.headers = headers
         self.queryItems = queryItems
         self.body = body
     }
-    
-    public init<E>(
+
+    public init(
         url: URL,
         method: Method = .get,
         headers: Headers? = nil,
-        queryItems: [URLQueryItem]? = nil,
-        encoding: E,
+        queryItems: [QueryItem]? = nil,
+        encoding: some Encodable,
         using encoder: JSONEncoder = JSONEncoder()
-    ) throws where E: Encodable {
-        self.address = .absolute(url)
+    ) throws {
+        address = .absolute(url)
         self.method = method
         self.headers = headers
         self.queryItems = queryItems
-        self.body = try encoder.encode(encoding)
+        body = try encoder.encode(encoding)
     }
 }

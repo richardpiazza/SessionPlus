@@ -8,7 +8,7 @@
 /// * 5xx Server Error: The server failed to fulfill an apparently valid request.
 public struct StatusCode: ExpressibleByIntegerLiteral, Hashable {
     public let rawValue: Int
-    
+
     public init(integerLiteral value: IntegerLiteralType) {
         rawValue = value
     }
@@ -19,7 +19,7 @@ extension StatusCode: Codable {
         let container = try decoder.singleValueContainer()
         rawValue = try container.decode(Int.self)
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(rawValue)
@@ -40,7 +40,7 @@ extension StatusCode: CustomStringConvertible {
 
 public extension StatusCode {
     // MARK: - Success
-    
+
     /// **200** Standard response for successful HTTP requests.
     static let ok: Self = 200
     /// **201** The request has been fulfilled, resulting in the creation of a new resource.
@@ -49,18 +49,18 @@ public extension StatusCode {
     static let accepted: Self = 202
     /// **204** The server successfully processed the request, and is not returning any content.
     static let noContent: Self = 204
-    
+
     // MARK: - Redirection
-    
+
     /// **301** This and all future requests should be directed to the given URI.
     static let movedPermanently: Self = 301
     /// **303** The response to the request can be found under another URI using the GET method.
     static let seeOther: Self = 303
     /// **307** In this case, the request should be repeated with another URI; however, future requests should still use the original URI
     static let temporaryRedirect: Self = 307
-    
+
     // MARK: - Client Errors
-    
+
     /// **400** The server cannot or will not process the request due to an apparent client error
     static let badRequest: Self = 400
     /// **401** Similar to 403 Forbidden, but specifically for use when authentication is required and has failed or has not yet been provided.
@@ -77,9 +77,9 @@ public extension StatusCode {
     static let iAmATeapot: Self = 418
     /// **429** The user has sent too many requests in a given amount of time.
     static let tooManyRequests: Self = 429
-    
+
     // MARK: - Server Errors
-    
+
     /// **500** A generic error message, given when an unexpected condition was encountered and no more specific message is suitable.
     static let internalServerError: Self = 500
     /// **501** The server either does not recognize the request method, or it lacks the ability to fulfill the request.

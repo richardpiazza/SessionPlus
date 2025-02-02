@@ -3,11 +3,11 @@ import Foundation
 /// Command HTTP Header
 public struct Header: ExpressibleByStringLiteral, Hashable {
     public let rawValue: String
-    
+
     public init(stringLiteral value: StringLiteralType) {
         rawValue = value
     }
-    
+
     /// HTTP Header date formatter; RFC1123
     public static var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -23,7 +23,7 @@ extension Header: Codable {
         let container = try decoder.singleValueContainer()
         rawValue = try container.decode(String.self)
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(rawValue)

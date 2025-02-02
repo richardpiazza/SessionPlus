@@ -18,61 +18,61 @@ public extension URLRequest {
             guard let baseURL = baseUrl else {
                 throw URLError(.badURL)
             }
-            
+
             let pathUrl = baseURL.appendingPathComponent(value)
-            
+
             guard let queryItems = request.queryItems else {
                 url = pathUrl
                 break
             }
-            
+
             guard var components = URLComponents(url: pathUrl, resolvingAgainstBaseURL: false) else {
                 throw URLError(.badURL)
             }
-            
-            components.queryItems = queryItems
-            
+
+            components.queryItems = queryItems.map { URLQueryItem($0) }
+
             guard let _url = components.url else {
                 throw URLError(.badURL)
             }
-            
+
             url = _url
         }
-        
+
         self.init(url: url)
-        
+
         httpMethod = request.method.rawValue
         setValue(Header.dateFormatter.string(from: Date()), forHeader: .date)
         setValue(.json, forHeader: .accept)
-        
+
         if let body = request.body {
             httpBody = body
             setValue(.json, forHeader: .contentType)
             setValue("\(body.count)", forHeader: .contentLength)
         }
-        
+
         if let headers = request.headers as? [String: String] {
-            headers.forEach {
-                setValue($0.value, forHTTPHeaderField: $0.key)
+            for header in headers {
+                setValue(header.value, forHTTPHeaderField: header.key)
             }
         }
     }
-    
+
     /// Sets a value for the header field.
     ///
     /// - parameters:
     ///   - value: The new value for the header field. Any existing value for the field is replaced by the new value.
     ///   - header: The header for which to set the value. (Headers are case sensitive)
     mutating func setValue(_ value: String, forHeader header: Header) {
-        self.setValue(value, forHTTPHeaderField: header.rawValue)
+        setValue(value, forHTTPHeaderField: header.rawValue)
     }
-    
+
     /// Sets a value for the header field.
     ///
     /// - parameters:
     ///   - value: The new value for the header field. Any existing value for the field is replaced by the new value.
     ///   - header: The header for which to set the value. (Headers are case sensitive)
     mutating func setValue(_ value: MIMEType, forHeader header: Header) {
-        self.setValue(value.rawValue, forHTTPHeaderField: header.rawValue)
+        setValue(value.rawValue, forHTTPHeaderField: header.rawValue)
     }
 }
