@@ -45,6 +45,12 @@ public struct QueryItem: Hashable, Sendable, Codable {
     }
 }
 
+extension QueryItem {
+    var description: String {
+        "\(name) = \(value ?? "NIL")"
+    }
+}
+
 extension Collection<QueryItem> {
     var metadata: Logger.Metadata {
         var metadata: Logger.Metadata = [:]

@@ -7,7 +7,7 @@ import Logging
 /// The encapsulation of information needed to perform a request against an HTTP/REST service endpoint.
 public protocol Request: Sendable {
     /// Method used to address the request.
-    var address: Address { get }
+    var resource: Resource { get }
     /// The HTTP verb (action/method) associated with the request.
     var method: Method { get }
     /// Custom headers to provide in the created `URLRequest`.
@@ -19,11 +19,14 @@ public protocol Request: Sendable {
 }
 
 public extension Request {
+    @available(*, deprecated, renamed: "resource")
+    var address: Address { resource }
+
     /// Routing path extension.
     ///
     /// This is appended to a _base URL_ instance to create an 'absolute path' to a resource.
     var path: String {
-        switch address {
+        switch resource {
         case .absolute(let url):
             URLComponents(url: url, resolvingAgainstBaseURL: false)?.path ?? ""
         case .path(let path):
@@ -41,7 +44,7 @@ public extension Request {
         headers[.authorization] = authorization.headerValue
 
         return AnyRequest(
-            address: address,
+            resource: resource,
             method: method,
             headers: headers,
             queryItems: queryItems,
@@ -51,9 +54,41 @@ public extension Request {
 }
 
 extension Request {
+    var description: String {
+        String(
+            format: "%1$@ %2$@, Headers: %3$d, Parameters: %4$d, Bytes: %5$d",
+            method.description,
+            path,
+            headers?.count ?? 0,
+            queryItems?.count ?? 0,
+            body?.count ?? 0,
+        )
+    }
+
+    var debugDescription: String {
+        let debugHeaders = (headers ?? [:])
+            .map { "\($0.key) = \($0.value)" }
+            .joined(separator: " ")
+
+        let debugParameters = (queryItems ?? [])
+            .map(\.description)
+            .joined(separator: " ")
+
+        let debugBody = String(decoding: body ?? Data(), as: UTF8.self)
+
+        return String(
+            format: "%1$@ %2$@, Headers: %3$@, Parameters: %4$@, Body: %5$@",
+            method.description,
+            path,
+            debugHeaders,
+            debugParameters,
+            debugBody,
+        )
+    }
+
     var metadata: Logger.Metadata {
         [
-            "address": .stringConvertible(address),
+            "resource": .stringConvertible(resource),
             "method": .stringConvertible(method),
             "bytes": .stringConvertible((body ?? Data()).count),
         ]
@@ -61,7 +96,7 @@ extension Request {
 
     var verboseMetadata: Logger.Metadata {
         [
-            "address": .stringConvertible(address),
+            "resource": .stringConvertible(resource),
             "method": .stringConvertible(method),
             "bytes": .stringConvertible((body ?? Data()).count),
             "body": .string(String(decoding: body ?? Data(), as: UTF8.self)),

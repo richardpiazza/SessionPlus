@@ -7,14 +7,14 @@ open class EmulatedClient: Client {
     public struct EmulatedRequest: Request, Identifiable, Codable {
 
         enum CodingKeys: String, CodingKey {
-            case address
+            case resource
             case method
             case headers
             case queryItems
             case body
         }
 
-        public var address: Address
+        public var resource: Resource
         public var method: SessionPlus.Method
         public var headers: Headers?
         public var queryItems: [QueryItem]?
@@ -30,7 +30,7 @@ open class EmulatedClient: Client {
         }
 
         public init(_ request: any Request) {
-            address = request.address
+            resource = request.resource
             method = request.method
             headers = request.headers
             queryItems = request.queryItems

@@ -2,12 +2,13 @@ import Foundation
 
 /// A `multipart/form-data` request for file uploading.
 public struct FormData: Request {
-    public let address: Address
+    public let resource: Resource
     public let method: Method
     public let headers: Headers?
     public let queryItems: [QueryItem]?
     public let body: Data?
 
+    @available(*, deprecated, renamed: "init(resource:method:headers:queryItems:field:filename:mimeType:content:)")
     public init(
         _ address: Address,
         method: Method = .post,
@@ -18,7 +19,34 @@ public struct FormData: Request {
         mimeType: MIMEType,
         content: Data,
     ) {
-        self.address = address
+        resource = address
+        self.method = method
+        self.queryItems = queryItems
+
+        let data = Self.data(
+            field: field,
+            filename: filename,
+            mimeType: mimeType,
+            content: content,
+        )
+
+        var headers = headers ?? [:]
+        headers[.contentType] = "multipart/form-data; boundary=\(data.boundary)"
+        self.headers = headers
+        body = data.data
+    }
+
+    public init(
+        resource: Resource,
+        method: Method = .post,
+        headers: Headers? = nil,
+        queryItems: [QueryItem]? = nil,
+        field: String = "file",
+        filename: String,
+        mimeType: MIMEType,
+        content: Data,
+    ) {
+        self.resource = resource
         self.method = method
         self.queryItems = queryItems
 
@@ -45,7 +73,7 @@ public struct FormData: Request {
         mimeType: MIMEType,
         content: Data,
     ) {
-        address = .path(path)
+        resource = .path(path)
         self.method = method
         self.queryItems = queryItems
 
@@ -72,7 +100,7 @@ public struct FormData: Request {
         mimeType: MIMEType,
         content: Data,
     ) {
-        address = .absolute(url)
+        resource = .absolute(url)
         self.method = method
         self.queryItems = queryItems
 
