@@ -25,7 +25,7 @@ open class AbsoluteURLSessionClient: Client {
         let urlRequest = try URLRequest(request: request)
 
         #if canImport(FoundationNetworking)
-        let (data, urlResponse) = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(Data, URLResponse), Error>) in
+        let (data, urlResponse) = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(Data, URLResponse), any Error>) in
             session.dataTask(with: urlRequest) { data, urlResponse, error in
                 if let error {
                     continuation.resume(throwing: error)
