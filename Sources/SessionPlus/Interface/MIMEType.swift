@@ -3,7 +3,7 @@ import Foundation
 /// MIME Types used in the API
 public struct MIMEType: Hashable, Sendable {
     public let rawValue: String
-    
+
     /// Any kind of binary data
     public static let bin: Self = "application/octet-stream"
     /// Graphics Interchange Format (GIF)

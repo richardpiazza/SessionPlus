@@ -43,7 +43,7 @@ open class AbsoluteURLSessionClient: Client {
         let response = AnyResponse(
             statusCode: urlResponse.statusCode,
             headers: urlResponse.headers,
-            body: data
+            body: data,
         )
 
         if verboseLogging {

@@ -19,7 +19,7 @@ let package = Package(
             targets: [
                 "SessionPlus",
                 "SessionPlusEmulation",
-            ]
+            ],
         ),
     ],
     dependencies: [
@@ -32,25 +32,25 @@ let package = Package(
             dependencies: [
                 .product(name: "AsyncPlus", package: "AsyncPlus"),
                 .product(name: "Logging", package: "swift-log"),
-            ]
+            ],
         ),
         .target(
             name: "SessionPlusEmulation",
             dependencies: [
                 "SessionPlus",
-            ]
+            ],
         ),
         .testTarget(
             name: "SessionPlusTests",
             dependencies: [
                 "SessionPlus",
                 "SessionPlusEmulation",
-            ]
+            ],
         ),
     ],
     swiftLanguageModes: [
         .v5,
-    ]
+    ],
 )
 
 for target in package.targets {

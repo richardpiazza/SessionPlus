@@ -16,7 +16,7 @@ public struct PNGImageFormDataRequest: Request {
         queryItems: [QueryItem]? = nil,
         field: String = "image",
         filename: String = "image.png",
-        imageData: Data
+        imageData: Data,
     ) {
         self.address = address
         self.method = method
@@ -37,7 +37,7 @@ public struct PNGImageFormDataRequest: Request {
         queryItems: [QueryItem]? = nil,
         field: String = "image",
         filename: String = "image.png",
-        imageData: Data
+        imageData: Data,
     ) {
         address = .path(path)
         self.method = method
@@ -58,7 +58,7 @@ public struct PNGImageFormDataRequest: Request {
         queryItems: [QueryItem]? = nil,
         field: String = "image",
         filename: String = "image.png",
-        imageData: Data
+        imageData: Data,
     ) {
         address = .absolute(url)
         self.method = method
@@ -86,7 +86,7 @@ public struct PNGImageFormDataRequest: Request {
             "--\(boundary)--".data(using: .utf8),
             "\r\n".data(using: .utf8),
         ]
-        chunks.compactMap { $0 }.forEach { data.append($0) }
+        chunks.compactMap(\.self).forEach { data.append($0) }
 
         return (boundary, data)
     }

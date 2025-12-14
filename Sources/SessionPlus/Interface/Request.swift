@@ -45,7 +45,7 @@ public extension Request {
             method: method,
             headers: headers,
             queryItems: queryItems,
-            body: body
+            body: body,
         )
     }
 }

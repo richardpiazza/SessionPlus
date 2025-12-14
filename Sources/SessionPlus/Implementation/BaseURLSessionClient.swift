@@ -15,13 +15,13 @@ open class BaseURLSessionClient: Client {
     public init(
         baseURL: URL,
         sessionConfiguration: URLSessionConfiguration = .default,
-        sessionDelegate: (any URLSessionDelegate)? = nil
+        sessionDelegate: (any URLSessionDelegate)? = nil,
     ) {
         self.baseURL = baseURL
         session = URLSession(
             configuration: sessionConfiguration,
             delegate: sessionDelegate,
-            delegateQueue: nil
+            delegateQueue: nil,
         )
     }
 
@@ -53,7 +53,7 @@ open class BaseURLSessionClient: Client {
         let response = AnyResponse(
             statusCode: urlResponse.statusCode,
             headers: urlResponse.headers,
-            body: data
+            body: data,
         )
 
         if verboseLogging {

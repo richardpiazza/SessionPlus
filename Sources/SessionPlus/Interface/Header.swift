@@ -12,7 +12,7 @@ public struct Header: Hashable, Sendable {
         formatter.locale = Locale(identifier: "en_US_POSIX")
         return formatter
     }()
-    
+
     /// The Accept request HTTP header advertises which content types, expressed as MIME types, the client is able to understand.
     public static let accept: Self = "Accept"
     /// The HTTP Authorization request header contains the credentials to authenticate a user agent with a server,
