@@ -69,6 +69,7 @@ jobs:
 #       files: build/reports/junit.xml
 
     - name: Publish Test Results
+      if: ${{ runner.os == 'macOS' }}
       uses: codecov/codecov-action@v5
       with:
         token: $[{ secrets.CODECOV_TOKEN }}
@@ -77,6 +78,7 @@ jobs:
           build/reports/junit.xml
 
     - name: Publish Coverage Results
+      if: ${{ runner.os == 'macOS' }}
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
