@@ -5,7 +5,7 @@ import FoundationNetworking
 import Logging
 
 /// The encapsulation of information needed to perform a request against an HTTP/REST service endpoint.
-public protocol Request {
+public protocol Request: Sendable {
     /// Method used to address the request.
     var address: Address { get }
     /// The HTTP verb (action/method) associated with the request.
@@ -36,7 +36,7 @@ public extension Request {
     /// - parameters:
     ///   - token: The token which should be used for authentication.
     /// - returns: A modified `Request` that includes an authentication value.
-    func authorized(_ authorization: Authorization) -> Request {
+    func authorized(_ authorization: Authorization) -> any Request {
         var headers = headers ?? [:]
         headers[.authorization] = authorization.headerValue
 
@@ -45,7 +45,7 @@ public extension Request {
             method: method,
             headers: headers,
             queryItems: queryItems,
-            body: body
+            body: body,
         )
     }
 }

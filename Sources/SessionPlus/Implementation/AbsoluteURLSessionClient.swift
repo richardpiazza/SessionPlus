@@ -11,7 +11,7 @@ open class AbsoluteURLSessionClient: Client {
     public let session: URLSession
     private let logger: Logger = .sessionPlus
 
-    public init(sessionConfiguration: URLSessionConfiguration = .default, sessionDelegate: URLSessionDelegate? = nil) {
+    public init(sessionConfiguration: URLSessionConfiguration = .default, sessionDelegate: (any URLSessionDelegate)? = nil) {
         session = URLSession(configuration: sessionConfiguration, delegate: sessionDelegate, delegateQueue: nil)
     }
 
@@ -25,7 +25,7 @@ open class AbsoluteURLSessionClient: Client {
         let urlRequest = try URLRequest(request: request)
 
         #if canImport(FoundationNetworking)
-        let (data, urlResponse) = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(Data, URLResponse), Error>) in
+        let (data, urlResponse) = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(Data, URLResponse), any Error>) in
             session.dataTask(with: urlRequest) { data, urlResponse, error in
                 if let error {
                     continuation.resume(throwing: error)
@@ -43,7 +43,7 @@ open class AbsoluteURLSessionClient: Client {
         let response = AnyResponse(
             statusCode: urlResponse.statusCode,
             headers: urlResponse.headers,
-            body: data
+            body: data,
         )
 
         if verboseLogging {

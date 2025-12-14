@@ -9,7 +9,7 @@ public struct AnyResponse: Response {
     public init(
         statusCode: StatusCode = .ok,
         headers: Headers = [:],
-        body: Data = Data()
+        body: Data = Data(),
     ) {
         self.statusCode = statusCode
         self.headers = headers

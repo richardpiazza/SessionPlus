@@ -12,7 +12,7 @@ public struct Post: Request {
         address: Address = .path(""),
         headers: Headers? = nil,
         queryItems: [QueryItem]? = nil,
-        body: Data? = nil
+        body: Data? = nil,
     ) {
         self.address = address
         self.headers = headers
@@ -25,7 +25,7 @@ public struct Post: Request {
         headers: Headers? = nil,
         queryItems: [QueryItem]? = nil,
         encoding: some Encodable,
-        using encoder: JSONEncoder = JSONEncoder()
+        using encoder: JSONEncoder = JSONEncoder(),
     ) throws {
         self.address = address
         self.headers = headers
@@ -37,7 +37,7 @@ public struct Post: Request {
         path: String,
         headers: Headers? = nil,
         queryItems: [QueryItem]? = nil,
-        body: Data? = nil
+        body: Data? = nil,
     ) {
         address = .path(path)
         self.headers = headers
@@ -50,7 +50,7 @@ public struct Post: Request {
         headers: Headers? = nil,
         queryItems: [QueryItem]? = nil,
         encoding: some Encodable,
-        using encoder: JSONEncoder = JSONEncoder()
+        using encoder: JSONEncoder = JSONEncoder(),
     ) throws {
         address = .path(path)
         self.headers = headers
@@ -62,7 +62,7 @@ public struct Post: Request {
         url: URL,
         headers: Headers? = nil,
         queryItems: [QueryItem]? = nil,
-        body: Data? = nil
+        body: Data? = nil,
     ) {
         address = .absolute(url)
         self.headers = headers
@@ -75,7 +75,7 @@ public struct Post: Request {
         headers: Headers? = nil,
         queryItems: [QueryItem]? = nil,
         encoding: some Encodable,
-        using encoder: JSONEncoder = JSONEncoder()
+        using encoder: JSONEncoder = JSONEncoder(),
     ) throws {
         address = .absolute(url)
         self.headers = headers

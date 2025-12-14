@@ -4,13 +4,13 @@ import FoundationNetworking
 #endif
 
 public extension URLCache {
-    enum Capacity {
+    enum Capacity: Equatable, Sendable {
         case bytes(Int)
         case megabytes(Int)
         case gigabytes(Int)
 
-        public static var twentyFiveMB: Capacity = .megabytes(25)
-        public static var twoHundredMB: Capacity = .megabytes(200)
+        public static let twentyFiveMB: Capacity = .megabytes(25)
+        public static let twoHundredMB: Capacity = .megabytes(200)
 
         public var bytes: Int {
             switch self {

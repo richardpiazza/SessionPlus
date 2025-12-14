@@ -28,7 +28,7 @@ open class EmulatedClient: Client {
             return [method.description, path, items].joined(separator: " ")
         }
 
-        public init(_ request: Request) {
+        public init(_ request: any Request) {
             address = request.address
             method = request.method
             headers = request.headers
@@ -36,7 +36,7 @@ open class EmulatedClient: Client {
             body = request.body
         }
 
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             address = try container.decode(Address.self, forKey: .address)
             method = try container.decode(Method.self, forKey: .method)
@@ -45,11 +45,11 @@ open class EmulatedClient: Client {
             body = try container.decodeIfPresent(Data.self, forKey: .body)
         }
 
-        public func encode(to encoder: Encoder) throws {
+        public func encode(to encoder: any Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(address, forKey: .address)
             try container.encode(method, forKey: .method)
-            try container.encodeIfPresent(headers as? [String: String], forKey: .headers)
+            try container.encodeIfPresent(headers, forKey: .headers)
             try container.encodeIfPresent(queryItems, forKey: .queryItems)
             try container.encodeIfPresent(body, forKey: .body)
         }
@@ -57,7 +57,7 @@ open class EmulatedClient: Client {
 
     public struct NotFound: Error {}
 
-    public typealias Cache = [EmulatedRequest.ID: Result<Response, Error>]
+    public typealias Cache = [EmulatedRequest.ID: Result<any Response, any Error>]
 
     public var verboseLogging: Bool = false
     public var responseCache: Cache
@@ -66,19 +66,19 @@ open class EmulatedClient: Client {
         self.responseCache = responseCache
     }
 
-    public init(requestResponse: [(Request, Response)]) {
+    public init(requestResponse: [(any Request, any Response)]) {
         responseCache = [:]
         for item in requestResponse {
             cache(response: item.1, for: item.0)
         }
     }
 
-    public func cache(response: Response, for request: Request) {
+    public func cache(response: any Response, for request: any Request) {
         let emulatedRequest = EmulatedRequest(request)
         responseCache[emulatedRequest.id] = .success(response)
     }
 
-    public func cache(error: Error, for request: Request) {
+    public func cache(error: any Error, for request: any Request) {
         let emulatedRequest = EmulatedRequest(request)
         responseCache[emulatedRequest.id] = .failure(error)
     }

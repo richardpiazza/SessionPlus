@@ -1,3 +1,4 @@
+import Logging
 @testable import SessionPlus
 import XCTest
 

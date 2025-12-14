@@ -1,7 +1,7 @@
 import Foundation
 
 /// Authorization schemes used in the API
-public enum Authorization {
+public enum Authorization: Equatable, Sendable {
     case basic(username: String, password: String?)
     case bearer(token: String)
     case custom(headerField: String, headerValue: String)

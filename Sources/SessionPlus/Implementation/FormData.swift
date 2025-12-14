@@ -16,7 +16,7 @@ public struct FormData: Request {
         field: String = "file",
         filename: String,
         mimeType: MIMEType,
-        content: Data
+        content: Data,
     ) {
         self.address = address
         self.method = method
@@ -26,7 +26,7 @@ public struct FormData: Request {
             field: field,
             filename: filename,
             mimeType: mimeType,
-            content: content
+            content: content,
         )
 
         var headers = headers ?? [:]
@@ -43,7 +43,7 @@ public struct FormData: Request {
         field: String = "file",
         filename: String,
         mimeType: MIMEType,
-        content: Data
+        content: Data,
     ) {
         address = .path(path)
         self.method = method
@@ -53,7 +53,7 @@ public struct FormData: Request {
             field: field,
             filename: filename,
             mimeType: mimeType,
-            content: content
+            content: content,
         )
 
         var headers = headers ?? [:]
@@ -70,7 +70,7 @@ public struct FormData: Request {
         field: String = "file",
         filename: String,
         mimeType: MIMEType,
-        content: Data
+        content: Data,
     ) {
         address = .absolute(url)
         self.method = method
@@ -80,7 +80,7 @@ public struct FormData: Request {
             field: field,
             filename: filename,
             mimeType: mimeType,
-            content: content
+            content: content,
         )
 
         var headers = headers ?? [:]
@@ -93,7 +93,7 @@ public struct FormData: Request {
         field: String,
         filename: String,
         mimeType: MIMEType,
-        content: Data
+        content: Data,
     ) -> (boundary: String, data: Data) {
         let boundary = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 
@@ -108,7 +108,7 @@ public struct FormData: Request {
             "--\(boundary)--".data(using: .utf8),
             "\r\n".data(using: .utf8),
         ]
-        chunks.compactMap { $0 }.forEach { data.append($0) }
+        chunks.compactMap(\.self).forEach { data.append($0) }
 
         return (boundary, data)
     }

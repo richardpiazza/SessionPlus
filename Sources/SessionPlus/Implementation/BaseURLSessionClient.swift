@@ -15,13 +15,13 @@ open class BaseURLSessionClient: Client {
     public init(
         baseURL: URL,
         sessionConfiguration: URLSessionConfiguration = .default,
-        sessionDelegate: URLSessionDelegate? = nil
+        sessionDelegate: (any URLSessionDelegate)? = nil,
     ) {
         self.baseURL = baseURL
         session = URLSession(
             configuration: sessionConfiguration,
             delegate: sessionDelegate,
-            delegateQueue: nil
+            delegateQueue: nil,
         )
     }
 
@@ -35,7 +35,7 @@ open class BaseURLSessionClient: Client {
         let urlRequest = try URLRequest(request: request, baseUrl: baseURL)
 
         #if canImport(FoundationNetworking)
-        let (data, urlResponse) = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(Data, URLResponse), Error>) in
+        let (data, urlResponse) = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(Data, URLResponse), any Error>) in
             session.dataTask(with: urlRequest) { data, urlResponse, error in
                 if let error {
                     continuation.resume(throwing: error)
@@ -53,7 +53,7 @@ open class BaseURLSessionClient: Client {
         let response = AnyResponse(
             statusCode: urlResponse.statusCode,
             headers: urlResponse.headers,
-            body: data
+            body: data,
         )
 
         if verboseLogging {

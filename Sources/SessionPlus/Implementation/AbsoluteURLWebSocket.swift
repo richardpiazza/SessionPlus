@@ -7,7 +7,7 @@ import FoundationNetworking
 
 open class AbsoluteURLWebSocket: NSObject, WebSocket {
 
-    private typealias ResumeHandler = (Result<Void, Error>) -> Void
+    private typealias ResumeHandler = (Result<Void, any Error>) -> Void
 
     let baseURL: URL
     let urlRequest: URLRequest
@@ -19,7 +19,7 @@ open class AbsoluteURLWebSocket: NSObject, WebSocket {
     private var keepAliveTask: Task<Void, Never>?
     private var messageSequence: PassthroughAsyncThrowingSequence<Socket.Message> = .init()
     private var resumeHandler: ResumeHandler?
-    private var pingContinuation: CheckedContinuation<Void, Error>?
+    private var pingContinuation: CheckedContinuation<Void, any Error>?
 
     /// Initialize a `WebSocketService`
     ///
@@ -85,7 +85,7 @@ open class AbsoluteURLWebSocket: NSObject, WebSocket {
         try await task.send(taskMessage)
     }
 
-    public func receive() -> AsyncThrowingStream<Socket.Message, Error> {
+    public func receive() -> AsyncThrowingStream<Socket.Message, any Error> {
         messageSequence = .init()
         return messageSequence.stream
     }
@@ -133,7 +133,7 @@ open class AbsoluteURLWebSocket: NSObject, WebSocket {
         }
     }
 
-    private func handleReceive(_ result: Result<URLSessionWebSocketTask.Message, Error>) {
+    private func handleReceive(_ result: Result<URLSessionWebSocketTask.Message, any Error>) {
         switch result {
         case .failure(let error):
             messageSequence.finish(throwing: error)
@@ -155,7 +155,7 @@ open class AbsoluteURLWebSocket: NSObject, WebSocket {
 extension AbsoluteURLWebSocket: URLSessionDelegate {}
 
 extension AbsoluteURLWebSocket: URLSessionTaskDelegate {
-    public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+    public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: (any Error)?) {
         guard let error else {
             return
         }

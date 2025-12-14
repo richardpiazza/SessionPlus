@@ -1,10 +1,10 @@
 import Foundation
 import Logging
 
-public typealias Headers = [AnyHashable: Any]
+public typealias Headers = [String: String]
 
 public extension Headers {
-    subscript(_ header: Header) -> Any? {
+    subscript(_ header: Header) -> String? {
         get {
             self[header.rawValue]
         }
@@ -18,7 +18,7 @@ extension Headers {
     var metadata: Logger.Metadata {
         var metadata: Logger.Metadata = [:]
         for (key, value) in self {
-            metadata[String(describing: key)] = .string(String(describing: value))
+            metadata[key] = .string(value)
         }
         return metadata
     }

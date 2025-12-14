@@ -1,11 +1,12 @@
+import Foundation
 import Logging
 
-public struct QueryItem: Codable {
+public struct QueryItem: Hashable, Sendable, Codable {
     public let name: String
     public let value: String?
 
     public init(
-        name: String
+        name: String,
     ) {
         self.name = name
         value = nil
@@ -13,7 +14,7 @@ public struct QueryItem: Codable {
 
     public init(
         name: String,
-        value: String
+        value: String,
     ) {
         self.name = name
         self.value = value
@@ -21,7 +22,7 @@ public struct QueryItem: Codable {
 
     public init(
         name: String,
-        value: Int
+        value: Int,
     ) {
         self.name = name
         self.value = String(describing: value)
@@ -29,7 +30,7 @@ public struct QueryItem: Codable {
 
     public init?(
         name: String,
-        percentEncoding: String?
+        percentEncoding: String?,
     ) {
         guard let percentEncoding else {
             return nil
