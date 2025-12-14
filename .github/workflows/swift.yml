@@ -21,6 +21,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v6
 
+    - name: Lint
+      if: ${{ runner.os == 'macOS' }}
+      shell: bash
+      run: swiftformat --lint . --reporter github-actions-log
+
     - name: Package Resolution
       shell: bash
       run: swift package resolve
@@ -32,3 +37,4 @@ jobs:
     - name: Test
       shell: bash
       run: swift test
+      
