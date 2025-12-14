@@ -9,7 +9,7 @@ public extension URLRequest {
     /// - parameters:
     ///   - request: `Request` parameters used to customize the request.
     ///   - baseUrl: The root of the API address.
-    init(request: Request, baseUrl: URL? = nil) throws {
+    init(request: any Request, baseUrl: URL? = nil) throws {
         let url: URL
         switch request.address {
         case .absolute(let value):
@@ -51,7 +51,7 @@ public extension URLRequest {
             setValue("\(body.count)", forHeader: .contentLength)
         }
 
-        if let headers = request.headers as? [String: String] {
+        if let headers = request.headers {
             for header in headers {
                 setValue(header.value, forHTTPHeaderField: header.key)
             }

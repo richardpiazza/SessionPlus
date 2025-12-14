@@ -1,6 +1,7 @@
+import Foundation
 import Logging
 
-public struct QueryItem: Codable {
+public struct QueryItem: Hashable, Sendable, Codable {
     public let name: String
     public let value: String?
 

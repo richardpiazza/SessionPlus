@@ -4,7 +4,7 @@ import FoundationNetworking
 #endif
 
 /// The method in which a `Request` URL is described and constructed.
-public enum Address: Codable {
+public enum Address: Equatable, Sendable, Codable {
     /// The full URL including any query components.
     case absolute(URL)
     /// Routing path extension.

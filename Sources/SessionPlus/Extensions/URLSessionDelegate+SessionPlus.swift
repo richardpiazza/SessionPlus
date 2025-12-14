@@ -6,10 +6,10 @@ import FoundationNetworking
 #if canImport(ObjectiveC)
 public extension URLSessionDelegate {
     /// A preconfigured URLSessionDelegate that will ignore invalid/self-signed SSL Certificates.
-    static var selfSigned: URLSessionDelegate { SelfSignedSessionDelegate() }
+    static var selfSigned: any URLSessionDelegate { SelfSignedSessionDelegate() }
 }
 
-public class SelfSignedSessionDelegate: NSObject, URLSessionDelegate {
+public final class SelfSignedSessionDelegate: NSObject, URLSessionDelegate {
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         guard challenge.previousFailureCount < 1 else {
             completionHandler(.cancelAuthenticationChallenge, nil)

@@ -8,7 +8,7 @@ public enum Socket {
     /// A code that indicates why a WebSocket connection closed.
     ///
     /// These follow the close codes defined in RFC 6455
-    public enum CloseCode: Int, Codable, CaseIterable {
+    public enum CloseCode: Int, Equatable, Sendable, Codable, CaseIterable {
         /// A code that indicates the connection is still open.
         case invalid = 0
         /// A code that indicates normal connection closure.
@@ -37,7 +37,7 @@ public enum Socket {
         case tlsHandshakeFailure = 1015
     }
 
-    public enum Message: Codable {
+    public enum Message: Equatable, Sendable, Codable {
         case data(Data)
         case string(String)
     }

@@ -7,7 +7,7 @@ import Foundation
 /// real-time data transfer from and to the server. This is made possible by providing a standardized
 /// way for the server to send content to the client without being first requested by the client, and
 /// allowing messages to be passed back and forth while keeping the connection open.
-public protocol WebSocket {
+public protocol WebSocket: Sendable {
     /// Initialize the `WebSocket` connection
     func start() async throws
     /// Terminate the connection
@@ -15,5 +15,5 @@ public protocol WebSocket {
     /// Send a `Socket.Message`
     func send(_ message: Socket.Message) async throws
     /// Receive an asynchronous stream of `Socket.Message`.
-    func receive() -> AsyncThrowingStream<Socket.Message, Error>
+    func receive() -> AsyncThrowingStream<Socket.Message, any Error>
 }

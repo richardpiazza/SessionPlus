@@ -11,7 +11,7 @@ open class AbsoluteURLSessionClient: Client {
     public let session: URLSession
     private let logger: Logger = .sessionPlus
 
-    public init(sessionConfiguration: URLSessionConfiguration = .default, sessionDelegate: URLSessionDelegate? = nil) {
+    public init(sessionConfiguration: URLSessionConfiguration = .default, sessionDelegate: (any URLSessionDelegate)? = nil) {
         session = URLSession(configuration: sessionConfiguration, delegate: sessionDelegate, delegateQueue: nil)
     }
 

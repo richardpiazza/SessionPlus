@@ -15,7 +15,7 @@ open class BaseURLSessionClient: Client {
     public init(
         baseURL: URL,
         sessionConfiguration: URLSessionConfiguration = .default,
-        sessionDelegate: URLSessionDelegate? = nil
+        sessionDelegate: (any URLSessionDelegate)? = nil
     ) {
         self.baseURL = baseURL
         session = URLSession(

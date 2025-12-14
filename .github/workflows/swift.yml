@@ -12,14 +12,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macOS-15, ubuntu-latest]
+        os: [macOS-26, ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
 
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Package Resolution
       shell: bash
