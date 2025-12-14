@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  PACKAGE_NAME: 'SessionPlus'
+
 jobs:
 
   SwiftLang:
@@ -21,11 +24,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v6
 
-    - name: Lint
-      if: ${{ runner.os == 'macOS' }}
-      shell: bash
-      run: swiftformat --lint . --reporter github-actions-log
-
     - name: Package Resolution
       shell: bash
       run: swift package resolve
@@ -34,7 +32,45 @@ jobs:
       shell: bash
       run: swift build
 
-    - name: Test
+    - name: Test (Linux)
+      if: ${{ runner.os == 'Linux' }}
       shell: bash
       run: swift test
-      
+
+    - name: Test (macOS)
+      if: ${{ runner.os == 'macOS' }}
+      shell: bash
+      run: swift test --enable-code-coverage -v 2>&1 | xcbeautify --report junit
+
+    - name: Lint
+      if: ${{ runner.os == 'macOS' }}
+      shell: bash
+      run: swiftformat --lint . --reporter github-actions-log
+
+    - name: Export Code Coverage
+      if: ${{ runner.os == 'macOS' }}
+      shell: bash
+      run: xcrun llvm-cov export -format="lcov" .build/debug/${{ env.PACKAGE_NAME }}PackageTests.xctest/Contents/MacOS/${{ env.PACKAGE_NAME }}PackageTests -instr-profile .build/debug/codecov/default.profdata > build/reports/coverage.lcov
+
+    - name: Collect Reports
+      if: ${{ runner.os == 'macOS' }}
+      uses: actions/upload-artifact@v6
+      with:
+        name: reports
+        path: |
+          build/reports/junit.xml
+          build/reports/coverage.lcov
+        retention-days: 7
+
+    - name: Publish Test Results
+      if: ${{ runner.os == 'macOS' }}
+      uses: EnricoMi/publish-unit-test-result-action/macos@v2
+      with:
+        files: build/reports/junit.xml
+
+    - name: Publish Coverage Results
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: |
+          build/reports/coverage.lcov
