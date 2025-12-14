@@ -11,7 +11,7 @@ public extension URLRequest {
     ///   - baseUrl: The root of the API address.
     init(request: any Request, baseUrl: URL? = nil) throws {
         let url: URL
-        switch request.address {
+        switch request.resource {
         case .absolute(let value):
             url = value
         case .path(let value):

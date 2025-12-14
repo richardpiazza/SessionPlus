@@ -12,6 +12,30 @@ public protocol Response {
 }
 
 extension Response {
+    var description: String {
+        String(
+            format: "%1$@, Headers: %2$d, Bytes: %3$d",
+            statusCode.description,
+            headers.count,
+            body.count,
+        )
+    }
+
+    var debugDescription: String {
+        let debugHeaders = headers
+            .map { "\($0.key) = \($0.value)" }
+            .joined(separator: " ")
+
+        let debugBody = String(decoding: body, as: UTF8.self)
+
+        return String(
+            format: "%1$@, Headers: %2$@, Body: %3$@",
+            statusCode.description,
+            debugHeaders,
+            debugBody,
+        )
+    }
+
     var metadata: Logger.Metadata {
         [
             "statusCode": .stringConvertible(statusCode),

@@ -3,8 +3,11 @@ import Foundation
 import FoundationNetworking
 #endif
 
+@available(*, deprecated, renamed: "Resource")
+public typealias Address = Resource
+
 /// The method in which a `Request` URL is described and constructed.
-public enum Address: Equatable, Sendable, Codable {
+public enum Resource: Equatable, Sendable, Codable {
     /// The full URL including any query components.
     case absolute(URL)
     /// Routing path extension.
@@ -13,7 +16,7 @@ public enum Address: Equatable, Sendable, Codable {
     case path(String)
 }
 
-extension Address: CustomStringConvertible {
+extension Resource: CustomStringConvertible {
     public var description: String {
         switch self {
         case .absolute(let url): url.absoluteString

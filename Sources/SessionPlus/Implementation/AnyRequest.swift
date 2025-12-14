@@ -2,12 +2,13 @@ import Foundation
 
 /// Generalized implementation of a `Request`.
 public struct AnyRequest: Request {
-    public let address: Address
+    public let resource: Resource
     public let method: Method
     public let headers: Headers?
     public let queryItems: [QueryItem]?
     public let body: Data?
 
+    @available(*, deprecated, renamed: "init(resource:method:headers:queryItems:body:)")
     public init(
         address: Address = .path(""),
         method: Method = .get,
@@ -15,13 +16,14 @@ public struct AnyRequest: Request {
         queryItems: [QueryItem]? = nil,
         body: Data? = nil,
     ) {
-        self.address = address
+        resource = address
         self.method = method
         self.headers = headers
         self.queryItems = queryItems
         self.body = body
     }
 
+    @available(*, deprecated, renamed: "init(resource:method:headers:queryItems:encoding:using:)")
     public init(
         address: Address = .path(""),
         method: Method = .get,
@@ -30,7 +32,36 @@ public struct AnyRequest: Request {
         encoding: some Encodable,
         using encoder: JSONEncoder = JSONEncoder(),
     ) throws {
-        self.address = address
+        resource = address
+        self.method = method
+        self.headers = headers
+        self.queryItems = queryItems
+        body = try encoder.encode(encoding)
+    }
+
+    public init(
+        resource: Resource = .path(""),
+        method: Method = .get,
+        headers: Headers? = nil,
+        queryItems: [QueryItem]? = nil,
+        body: Data? = nil,
+    ) {
+        self.resource = resource
+        self.method = method
+        self.headers = headers
+        self.queryItems = queryItems
+        self.body = body
+    }
+
+    public init(
+        resource: Resource = .path(""),
+        method: Method = .get,
+        headers: Headers? = nil,
+        queryItems: [QueryItem]? = nil,
+        encoding: some Encodable,
+        using encoder: JSONEncoder = JSONEncoder(),
+    ) throws {
+        self.resource = resource
         self.method = method
         self.headers = headers
         self.queryItems = queryItems
@@ -44,7 +75,7 @@ public struct AnyRequest: Request {
         queryItems: [QueryItem]? = nil,
         body: Data? = nil,
     ) {
-        address = .path(path)
+        resource = .path(path)
         self.method = method
         self.headers = headers
         self.queryItems = queryItems
@@ -59,7 +90,7 @@ public struct AnyRequest: Request {
         encoding: some Encodable,
         using encoder: JSONEncoder = JSONEncoder(),
     ) throws {
-        address = .path(path)
+        resource = .path(path)
         self.method = method
         self.headers = headers
         self.queryItems = queryItems
@@ -73,7 +104,7 @@ public struct AnyRequest: Request {
         queryItems: [QueryItem]? = nil,
         body: Data? = nil,
     ) {
-        address = .absolute(url)
+        resource = .absolute(url)
         self.method = method
         self.headers = headers
         self.queryItems = queryItems
@@ -88,7 +119,7 @@ public struct AnyRequest: Request {
         encoding: some Encodable,
         using encoder: JSONEncoder = JSONEncoder(),
     ) throws {
-        address = .absolute(url)
+        resource = .absolute(url)
         self.method = method
         self.headers = headers
         self.queryItems = queryItems
