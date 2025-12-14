@@ -7,16 +7,36 @@ import Logging
 /// A `Client` implementation that operates expecting all requests use _absolute_ urls.
 open class AbsoluteURLSessionClient: Client {
 
-    public var verboseLogging: Bool = false
+    @available(*, deprecated)
+    public var verboseLogging: Bool {
+        get { logLevel.value == .trace }
+        set { setLogLevel(newValue ? .trace : .debug) }
+    }
+
     public let session: URLSession
     private let logger: Logger = .sessionPlus
+    private let logLevel: ProtectedState = ProtectedState()
 
-    public init(sessionConfiguration: URLSessionConfiguration = .default, sessionDelegate: (any URLSessionDelegate)? = nil) {
-        session = URLSession(configuration: sessionConfiguration, delegate: sessionDelegate, delegateQueue: nil)
+    public init(
+        sessionConfiguration: URLSessionConfiguration = .default,
+        sessionDelegate: (any URLSessionDelegate)? = nil,
+    ) {
+        session = URLSession(
+            configuration: sessionConfiguration,
+            delegate: sessionDelegate, delegateQueue: nil,
+        )
+    }
+
+    public var logLevelStream: AsyncStream<Logger.Level> {
+        logLevel.asyncStream
+    }
+
+    public func setLogLevel(_ level: Logger.Level) {
+        logLevel.setValue(level)
     }
 
     public func performRequest(_ request: any Request) async throws -> any Response {
-        if verboseLogging {
+        if logLevel.value > .trace {
             logger.debug("HTTP Request", metadata: request.verboseMetadata)
         } else {
             logger.trace("HTTP Request", metadata: request.metadata)
@@ -46,7 +66,7 @@ open class AbsoluteURLSessionClient: Client {
             body: data,
         )
 
-        if verboseLogging {
+        if logLevel.value > .trace {
             logger.debug("HTTP Response", metadata: response.verboseMetadata)
         } else {
             logger.trace("HTTP Response", metadata: response.metadata)

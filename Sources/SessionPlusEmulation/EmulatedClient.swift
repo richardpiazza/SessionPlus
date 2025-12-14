@@ -1,4 +1,5 @@
 import Foundation
+import Logging
 import SessionPlus
 
 open class EmulatedClient: Client {
@@ -35,32 +36,20 @@ open class EmulatedClient: Client {
             queryItems = request.queryItems
             body = request.body
         }
-
-        public init(from decoder: any Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            address = try container.decode(Address.self, forKey: .address)
-            method = try container.decode(Method.self, forKey: .method)
-            headers = try container.decodeIfPresent([String: String].self, forKey: .headers)
-            queryItems = try container.decodeIfPresent([QueryItem].self, forKey: .queryItems)
-            body = try container.decodeIfPresent(Data.self, forKey: .body)
-        }
-
-        public func encode(to encoder: any Encoder) throws {
-            var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(address, forKey: .address)
-            try container.encode(method, forKey: .method)
-            try container.encodeIfPresent(headers, forKey: .headers)
-            try container.encodeIfPresent(queryItems, forKey: .queryItems)
-            try container.encodeIfPresent(body, forKey: .body)
-        }
     }
 
     public struct NotFound: Error {}
 
     public typealias Cache = [EmulatedRequest.ID: Result<any Response, any Error>]
 
-    public var verboseLogging: Bool = false
+    @available(*, deprecated)
+    public var verboseLogging: Bool {
+        get { logLevel.value == .trace }
+        set { setLogLevel(newValue ? .trace : .debug) }
+    }
+
     public var responseCache: Cache
+    private var logLevel: ProtectedState = ProtectedState()
 
     public init(responseCache: Cache = [:]) {
         self.responseCache = responseCache
@@ -81,6 +70,14 @@ open class EmulatedClient: Client {
     public func cache(error: any Error, for request: any Request) {
         let emulatedRequest = EmulatedRequest(request)
         responseCache[emulatedRequest.id] = .failure(error)
+    }
+
+    public var logLevelStream: AsyncStream<Logger.Level> {
+        logLevel.asyncStream
+    }
+
+    public func setLogLevel(_ level: Logger.Level) {
+        logLevel.setValue(level)
     }
 
     public func performRequest(_ request: any Request) async throws -> any Response {

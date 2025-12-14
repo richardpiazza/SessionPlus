@@ -26,6 +26,7 @@ let package = Package(
         .package(url: "https://github.com/swiftlang/swift-testing.git", branch: "swift-6.2-RELEASE"),
         .package(url: "https://github.com/richardpiazza/AsyncPlus.git", .upToNextMajor(from: "0.3.2")),
         .package(url: "https://github.com/apple/swift-log.git", from: "1.6.2"),
+        .package(url: "https://github.com/swhitty/swift-mutex.git", from: "0.0.6"),
     ],
     targets: [
         .target(
@@ -33,6 +34,7 @@ let package = Package(
             dependencies: [
                 .product(name: "AsyncPlus", package: "AsyncPlus"),
                 .product(name: "Logging", package: "swift-log"),
+                .product(name: "Mutex", package: "swift-mutex"),
             ],
         ),
         .target(
