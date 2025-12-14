@@ -1,19 +1,19 @@
 import Logging
 @testable import SessionPlus
-import XCTest
+import Testing
 
-final class QueryItemTests: XCTestCase {
+struct QueryItemTests {
 
-    func testEncodedValue() throws {
+    @Test func encodedValue() throws {
         let nilValue = QueryItem(name: "accept", percentEncoding: nil)
-        XCTAssertNil(nilValue)
+        #expect(nilValue == nil)
 
-        let unmodified = try XCTUnwrap(QueryItem(name: "item", percentEncoding: "fork"))
-        XCTAssertEqual(unmodified.value, "fork")
-        XCTAssertEqual([unmodified].metadata, ["item": .string("fork")])
+        let unmodified = try #require(QueryItem(name: "item", percentEncoding: "fork"))
+        #expect(unmodified.value == "fork")
+        #expect([unmodified].metadata == ["item": .string("fork")])
 
-        let encoded = try XCTUnwrap(QueryItem(name: "query", percentEncoding: "search term"))
-        XCTAssertEqual(encoded.value, "search%20term")
-        XCTAssertEqual([encoded].metadata, ["query": .string("search%20term")])
+        let encoded = try #require(QueryItem(name: "query", percentEncoding: "search term"))
+        #expect(encoded.value == "search%20term")
+        #expect([encoded].metadata == ["query": .string("search%20term")])
     }
 }

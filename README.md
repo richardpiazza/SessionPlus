@@ -2,8 +2,8 @@
 
 A swift _request & response_ framework for JSON apis.
 
-[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Frichardpiazza%2FSessionPlus%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/richardpiazza/SessionPlus)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Frichardpiazza%2FSessionPlus%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/richardpiazza/SessionPlus)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Frichardpiazza%2FSessionPlus%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/richardpiazza/SessionPlus)
 
 This package has been designed to work across multiple swift environments by utilizing conditional checks. It has been tested on Apple platforms (macOS, iOS, tvOS, watchOS), as well as Linux (Ubuntu).
 
@@ -35,19 +35,6 @@ let response = try await client.request(request) as ApiResult
 let response: ApiResult = try await client.request(request)
 ```
 
-### Flexibility
-
-The `Client` protocol declares up to three forms requests based on platform abilities:
-
-```swift
-// async/await for swift 5.5+
-func performRequest(_ request: Request) async throws -> Response
-// completion handler for backwards compatibility
-func performRequest(_ request: Request, completion: @escaping (Result<Response, Error>) -> Void)
-// Combine publisher that emits with a response
-func performRequest(_ request: Request) -> AnyPublisher<Response, Error>
-```
-
 ## Installation
 
 **SessionPlus** is distributed using the [Swift Package Manager](https://swift.org/package-manager). 
@@ -63,8 +50,8 @@ let package = Package(
   targets: [
     .target(
       name: "MyPackage",
-      dependnecies: [
-        "SessionPlus"
+      dependencies: [
+        .product(name: "SessionPlus", package: "SessionPlus"),
       ]
     )
   ]
