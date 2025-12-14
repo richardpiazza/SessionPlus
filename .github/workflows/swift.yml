@@ -62,25 +62,23 @@ jobs:
           build/reports/coverage.lcov
         retention-days: 7
 
-#   - name: Publish Test Results
-#     if: ${{ runner.os == 'macOS' }}
-#     uses: EnricoMi/publish-unit-test-result-action/macos@v2
-#     with:
-#       files: build/reports/junit.xml
-
     - name: Publish Test Results
       if: ${{ runner.os == 'macOS' }}
-      uses: codecov/codecov-action@v5
+      uses: EnricoMi/publish-unit-test-result-action/macos@v2
       with:
-        token: $[{ secrets.CODECOV_TOKEN }}
-        report_type: test_results
-        files: |
-          build/reports/junit.xml
+        files: build/reports/junit.xml
+
+#   - name: Publish Test Results
+#     if: ${{ runner.os == 'macOS' }}
+#     uses: codecov/codecov-action@v5
+#     with:
+#       token: $[{ secrets.CODECOV_TOKEN }}
+#       report_type: test_results
+#       files: build/reports/junit.xml
 
     - name: Publish Coverage Results
       if: ${{ runner.os == 'macOS' }}
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        files: |
-          build/reports/coverage.lcov
+        files: build/reports/coverage.lcov
