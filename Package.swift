@@ -23,6 +23,7 @@ let package = Package(
         ),
     ],
     dependencies: [
+        .package(url: "https://github.com/swiftlang/swift-testing.git", branch: "swift-6.2-RELEASE"),
         .package(url: "https://github.com/richardpiazza/AsyncPlus.git", .upToNextMajor(from: "0.3.2")),
         .package(url: "https://github.com/apple/swift-log.git", from: "1.6.2"),
     ],
@@ -45,6 +46,7 @@ let package = Package(
             dependencies: [
                 "SessionPlus",
                 "SessionPlusEmulation",
+                .product(name: "Testing", package: "swift-testing"),
             ],
         ),
     ],
