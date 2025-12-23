@@ -1,4 +1,3 @@
-import AsyncPlus
 import Foundation
 #if canImport(FoundationNetworking)
 import FoundationNetworking
@@ -17,7 +16,7 @@ open class AbsoluteURLWebSocket: NSObject, WebSocket {
     lazy var task = session.webSocketTask(with: urlRequest)
 
     private var keepAliveTask: Task<Void, Never>?
-    private var messageSequence: PassthroughAsyncThrowingSequence<Socket.Message> = .init()
+    private var messageContinuation: AsyncThrowingStream<Socket.Message, any Error>.Continuation?
     private var resumeHandler: ResumeHandler?
     private var pingContinuation: CheckedContinuation<Void, any Error>?
 
@@ -75,6 +74,8 @@ open class AbsoluteURLWebSocket: NSObject, WebSocket {
         keepAliveTask?.cancel()
         pingContinuation?.resume(returning: ())
         pingContinuation = nil
+        messageContinuation?.finish()
+        messageContinuation = nil
 
         task.cancel(with: .normalClosure, reason: nil)
         session.invalidateAndCancel()
@@ -86,8 +87,12 @@ open class AbsoluteURLWebSocket: NSObject, WebSocket {
     }
 
     public func receive() -> AsyncThrowingStream<Socket.Message, any Error> {
-        messageSequence = .init()
-        return messageSequence.stream
+        let (stream, continuation) = AsyncThrowingStream.makeStream(of: Socket.Message.self)
+        continuation.onTermination = { [weak self] _ in
+            self?.stop()
+        }
+        messageContinuation = continuation
+        return stream
     }
 
     private func resume(with handler: @escaping ResumeHandler) {
@@ -136,12 +141,12 @@ open class AbsoluteURLWebSocket: NSObject, WebSocket {
     private func handleReceive(_ result: Result<URLSessionWebSocketTask.Message, any Error>) {
         switch result {
         case .failure(let error):
-            messageSequence.finish(throwing: error)
+            messageContinuation?.finish(throwing: error)
 
             stop()
         case .success(let message):
             let message = Socket.Message(message)
-            messageSequence.yield(message)
+            messageContinuation?.yield(message)
 
             // Oddity of the `URLSessionWebSocketTask` implementation. Requires re-assignment of the
             // 'receive' completion to read the next full result.
