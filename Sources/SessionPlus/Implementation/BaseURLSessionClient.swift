@@ -5,7 +5,7 @@ import FoundationNetworking
 import Logging
 
 /// A `Client` implementation that operates with a _base_ URL which all requests use to form the address.
-open class BaseURLSessionClient: Client {
+public final class BaseURLSessionClient: Client {
 
     @available(*, deprecated)
     public var verboseLogging: Bool {
@@ -13,7 +13,7 @@ open class BaseURLSessionClient: Client {
         set { setLogLevel(newValue ? .trace : .debug) }
     }
 
-    open var baseURL: URL
+    public let baseURL: URL
     public let session: URLSession
     private let logger: Logger = .sessionPlus
     private let logLevel: ProtectedState = ProtectedState()

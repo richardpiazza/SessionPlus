@@ -1,11 +1,7 @@
 import Foundation
 import Logging
 
-// TODO: `Sendable` Conformance
-public protocol Client {
-    @available(*, deprecated, message: "Direct state access should be avoided.")
-    var verboseLogging: Bool { get set }
-
+public protocol Client: Sendable {
     /// Provides an `AsyncStream` with the clients `Logger.Level` state.
     var logLevelStream: AsyncStream<Logger.Level> { get }
 
@@ -20,7 +16,7 @@ public protocol Client {
     /// - parameters:
     ///   - request: The details of the request to perform.
     /// - returns: The `Response` to the `Request`.
-    func performRequest(_ request: any Request) async throws -> any Response
+    @concurrent func performRequest(_ request: any Request) async throws -> any Response
 }
 
 public extension Client {
@@ -30,10 +26,10 @@ public extension Client {
     ///   - request: The details of the request to perform.
     ///   - decoder: The `JSONDecoder` that should be used to deserialize the result data.
     /// - returns: The decoded `Response` value.
-    func performRequest<Content>(
+    @concurrent func performRequest<Content: Decodable>(
         _ request: any Request,
         using decoder: JSONDecoder = JSONDecoder(),
-    ) async throws -> Content where Content: Decodable {
+    ) async throws -> Content {
         let response = try await performRequest(request)
         return try decoder.decode(Content.self, from: response.body)
     }

@@ -1,8 +1,9 @@
 import Foundation
 import Logging
+import Mutex
 import SessionPlus
 
-open class EmulatedClient: Client {
+public final class EmulatedClient: Client {
 
     public struct EmulatedRequest: Request, Identifiable, Codable {
 
@@ -42,21 +43,19 @@ open class EmulatedClient: Client {
 
     public typealias Cache = [EmulatedRequest.ID: Result<any Response, any Error>]
 
-    @available(*, deprecated)
-    public var verboseLogging: Bool {
-        get { logLevel.value == .trace }
-        set { setLogLevel(newValue ? .trace : .debug) }
+    public var responseCache: Cache {
+        cache.withLock { $0 }
     }
 
-    public var responseCache: Cache
-    private var logLevel: ProtectedState = ProtectedState()
+    private let logLevel: ProtectedState = ProtectedState()
+    private let cache: Mutex<Cache>
 
     public init(responseCache: Cache = [:]) {
-        self.responseCache = responseCache
+        cache = Mutex(responseCache)
     }
 
     public init(requestResponse: [(any Request, any Response)]) {
-        responseCache = [:]
+        cache = Mutex([:])
         for item in requestResponse {
             cache(response: item.1, for: item.0)
         }
@@ -64,12 +63,16 @@ open class EmulatedClient: Client {
 
     public func cache(response: any Response, for request: any Request) {
         let emulatedRequest = EmulatedRequest(request)
-        responseCache[emulatedRequest.id] = .success(response)
+        cache.withLock {
+            $0[emulatedRequest.id] = .success(response)
+        }
     }
 
     public func cache(error: any Error, for request: any Request) {
         let emulatedRequest = EmulatedRequest(request)
-        responseCache[emulatedRequest.id] = .failure(error)
+        cache.withLock {
+            $0[emulatedRequest.id] = .failure(error)
+        }
     }
 
     public var logLevelStream: AsyncStream<Logger.Level> {

@@ -5,7 +5,7 @@ import FoundationNetworking
 import Logging
 
 /// A `Client` implementation that operates expecting all requests use _absolute_ urls.
-open class AbsoluteURLSessionClient: Client {
+public final class AbsoluteURLSessionClient: Client {
 
     @available(*, deprecated)
     public var verboseLogging: Bool {

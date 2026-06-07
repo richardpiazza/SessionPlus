@@ -23,7 +23,6 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/swiftlang/swift-testing.git", branch: "swift-6.2-RELEASE"),
         .package(url: "https://github.com/apple/swift-log.git", from: "1.6.2"),
         .package(url: "https://github.com/swhitty/swift-mutex.git", from: "0.0.6"),
     ],
@@ -46,11 +45,11 @@ let package = Package(
             dependencies: [
                 "SessionPlus",
                 "SessionPlusEmulation",
-                .product(name: "Testing", package: "swift-testing"),
             ],
         ),
     ],
     swiftLanguageModes: [
+        .v6,
         .v5,
     ],
 )

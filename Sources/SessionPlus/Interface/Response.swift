@@ -2,7 +2,7 @@ import Foundation
 import Logging
 
 /// Encapsulation of output obtained while performing a request against an HTTP/REST service.
-public protocol Response {
+public protocol Response: Sendable {
     /// Response code
     var statusCode: StatusCode { get }
     /// Response headers
