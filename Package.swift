@@ -59,7 +59,7 @@ for target in package.targets {
     settings.append(contentsOf: [
         .enableUpcomingFeature("ExistentialAny"),
         .enableUpcomingFeature("MemberImportVisibility"),
-        .enableUpcomingFeature("StrictConcurrency=complete"),
+        .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
     ])
     target.swiftSettings = settings
 }
