@@ -23,8 +23,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/swiftlang/swift-testing.git", branch: "swift-6.2-RELEASE"),
-        .package(url: "https://github.com/apple/swift-log.git", from: "1.6.2"),
+        .package(url: "https://github.com/apple/swift-log.git", from: "1.13.2"),
         .package(url: "https://github.com/swhitty/swift-mutex.git", from: "0.0.6"),
     ],
     targets: [
@@ -46,11 +45,11 @@ let package = Package(
             dependencies: [
                 "SessionPlus",
                 "SessionPlusEmulation",
-                .product(name: "Testing", package: "swift-testing"),
             ],
         ),
     ],
     swiftLanguageModes: [
+        .v6,
         .v5,
     ],
 )
@@ -60,7 +59,7 @@ for target in package.targets {
     settings.append(contentsOf: [
         .enableUpcomingFeature("ExistentialAny"),
         .enableUpcomingFeature("MemberImportVisibility"),
-        .enableUpcomingFeature("StrictConcurrency=complete"),
+        .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
     ])
     target.swiftSettings = settings
 }

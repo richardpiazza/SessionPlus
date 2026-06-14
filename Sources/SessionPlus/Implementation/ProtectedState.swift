@@ -51,9 +51,3 @@ package class ProtectedState<T: Sendable>: @unchecked Sendable {
         }
     }
 }
-
-package extension ProtectedState where T == Logger.Level {
-    convenience init(level: Logger.Level = .debug) {
-        self.init(level)
-    }
-}

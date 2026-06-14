@@ -2,23 +2,28 @@ import Foundation
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
+import Mutex
+
 #if canImport(ObjectiveC)
 
-open class AbsoluteURLWebSocket: NSObject, WebSocket {
-
-    private typealias ResumeHandler = (Result<Void, any Error>) -> Void
+public final class AbsoluteURLWebSocket: NSObject, WebSocket {
 
     let baseURL: URL
     let urlRequest: URLRequest
     let keepAliveInterval: Double
 
-    lazy var session: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
-    lazy var task = session.webSocketTask(with: urlRequest)
+    private let startContinuation: Mutex<CheckedContinuation<Void, any Error>?> = Mutex(nil)
+    private let sessionTask: Mutex<(URLSession, URLSessionWebSocketTask)?> = Mutex(nil)
+    private let keepAliveTask: Mutex<Task<Void, Never>?> = Mutex(nil)
+    private let messageContinuation: Mutex<AsyncThrowingStream<Socket.Message, any Error>.Continuation?> = Mutex(nil)
 
-    private var keepAliveTask: Task<Void, Never>?
-    private var messageContinuation: AsyncThrowingStream<Socket.Message, any Error>.Continuation?
-    private var resumeHandler: ResumeHandler?
-    private var pingContinuation: CheckedContinuation<Void, any Error>?
+    private var session: URLSession? {
+        sessionTask.withLock { $0?.0 }
+    }
+
+    private var socketTask: URLSessionWebSocketTask? {
+        sessionTask.withLock { $0?.1 }
+    }
 
     /// Initialize a `WebSocketService`
     ///
@@ -26,7 +31,11 @@ open class AbsoluteURLWebSocket: NSObject, WebSocket {
     ///   - baseURL: The root **WebSocket** url path.
     ///   - authorization: Credentials needed to connect.
     ///   - keepAliveInterval: Number of seconds between ping/pong signals. (0=disabled)
-    public init(baseURL: URL, authorization: Authorization? = nil, keepAliveInterval: Double = 15.0) throws {
+    public init(
+        baseURL: URL,
+        authorization: Authorization? = nil,
+        keepAliveInterval: Double = 15.0,
+    ) throws {
         guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
             throw URLError(.badURL)
         }
@@ -58,32 +67,52 @@ open class AbsoluteURLWebSocket: NSObject, WebSocket {
     }
 
     public func start() async throws {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            resume { result in
-                switch result {
-                case .success:
-                    continuation.resume()
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+        let session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
+        let task = session.webSocketTask(with: urlRequest)
+
+        do {
+            try await withCheckedThrowingContinuation { continuation in
+                startContinuation.withLock {
+                    $0 = continuation
                 }
+
+                task.resume()
             }
+        } catch {
+            stop()
+            throw error
         }
+
+        sessionTask.withLock {
+            $0 = (session, task)
+        }
+
+        task.receive { [weak self] result in
+            self?.handleReceive(result)
+        }
+
+        keepAlive()
     }
 
     public func stop() {
-        keepAliveTask?.cancel()
-        pingContinuation?.resume(returning: ())
-        pingContinuation = nil
-        messageContinuation?.finish()
-        messageContinuation = nil
+        keepAliveTask.withLock {
+            $0?.cancel()
+        }
 
-        task.cancel(with: .normalClosure, reason: nil)
-        session.invalidateAndCancel()
+        messageContinuation.withLock {
+            $0?.finish()
+            $0 = nil
+        }
+
+        socketTask?.cancel(with: .normalClosure, reason: nil)
+        session?.invalidateAndCancel()
+
+        sessionTask.withLock { $0 = nil }
     }
 
     public func send(_ message: Socket.Message) async throws {
         let taskMessage = URLSessionWebSocketTask.Message(message)
-        try await task.send(taskMessage)
+        try await socketTask?.send(taskMessage)
     }
 
     public func receive() -> AsyncThrowingStream<Socket.Message, any Error> {
@@ -91,15 +120,10 @@ open class AbsoluteURLWebSocket: NSObject, WebSocket {
         continuation.onTermination = { [weak self] _ in
             self?.stop()
         }
-        messageContinuation = continuation
+        messageContinuation.withLock {
+            $0 = continuation
+        }
         return stream
-    }
-
-    private func resume(with handler: @escaping ResumeHandler) {
-        resumeHandler = handler
-        session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
-        task = session.webSocketTask(with: urlRequest)
-        task.resume()
     }
 
     private func keepAlive() {
@@ -107,11 +131,9 @@ open class AbsoluteURLWebSocket: NSObject, WebSocket {
             return
         }
 
-        keepAliveTask?.cancel()
-
-        keepAliveTask = Task {
+        let task = Task {
             do {
-                try await Task.sleep(nanoseconds: UInt64(keepAliveInterval * 1_000_000_000))
+                try await Task.sleep(for: .seconds(keepAliveInterval))
                 try Task.checkCancellation()
                 try await ping()
                 try Task.checkCancellation()
@@ -120,25 +142,32 @@ open class AbsoluteURLWebSocket: NSObject, WebSocket {
                 print(error)
             }
         }
+
+        keepAliveTask.withLock {
+            $0?.cancel()
+            $0 = task
+        }
     }
 
     private func ping() async throws {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            pingContinuation = continuation
-            task.sendPing { [weak self] error in
-                if let resumingContinuation = self?.pingContinuation {
-                    if let error {
-                        resumingContinuation.resume(throwing: error)
-                    } else {
-                        resumingContinuation.resume()
-                    }
-                    self?.pingContinuation = nil
+        guard let socketTask else {
+            return
+        }
+
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
+            socketTask.sendPing { error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume()
                 }
             }
         }
     }
 
     private func handleReceive(_ result: Result<URLSessionWebSocketTask.Message, any Error>) {
+        let messageContinuation = messageContinuation.withLock { $0 }
+
         switch result {
         case .failure(let error):
             messageContinuation?.finish(throwing: error)
@@ -150,7 +179,7 @@ open class AbsoluteURLWebSocket: NSObject, WebSocket {
 
             // Oddity of the `URLSessionWebSocketTask` implementation. Requires re-assignment of the
             // 'receive' completion to read the next full result.
-            task.receive { [weak self] result in
+            socketTask?.receive { [weak self] result in
                 self?.handleReceive(result)
             }
         }
@@ -165,29 +194,26 @@ extension AbsoluteURLWebSocket: URLSessionTaskDelegate {
             return
         }
 
-        resumeHandler?(.failure(error))
-        resumeHandler = nil
-
-        stop()
+        startContinuation.withLock {
+            $0?.resume(throwing: error)
+            $0 = nil
+        }
     }
 }
 
 extension AbsoluteURLWebSocket: URLSessionWebSocketDelegate {
     public func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didOpenWithProtocol protocol: String?) {
         print("WebSocket Opened; Protocol: '\(`protocol` ?? "")'")
-        resumeHandler?(.success(()))
-        resumeHandler = nil
 
-        task.receive { [weak self] result in
-            self?.handleReceive(result)
+        startContinuation.withLock {
+            $0?.resume(returning: ())
+            $0 = nil
         }
-
-        keepAlive()
     }
 
-    public func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, closeReason: Data?) {
+    public func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
         let code = Socket.CloseCode(closeCode)
-        let reason = String(data: closeReason ?? Data(), encoding: .utf8) ?? ""
+        let reason = String(decoding: reason ?? Data(), as: UTF8.self)
 
         if code == .normalClosure {
             print("""
