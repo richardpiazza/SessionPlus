@@ -15,16 +15,18 @@ public final class AbsoluteURLSessionClient: Client {
 
     public let session: URLSession
     private let logger: Logger = .sessionPlus
-    private let logLevel: ProtectedState = ProtectedState()
+    private let logLevel: ProtectedState<Logger.Level>
 
     public init(
         sessionConfiguration: URLSessionConfiguration = .default,
         sessionDelegate: (any URLSessionDelegate)? = nil,
+        logLevel: Logger.Level = .trace,
     ) {
         session = URLSession(
             configuration: sessionConfiguration,
             delegate: sessionDelegate, delegateQueue: nil,
         )
+        self.logLevel = ProtectedState(logLevel)
     }
 
     public var logLevelStream: AsyncStream<Logger.Level> {

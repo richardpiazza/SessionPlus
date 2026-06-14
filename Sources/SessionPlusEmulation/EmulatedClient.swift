@@ -47,7 +47,7 @@ public final class EmulatedClient: Client {
         cache.withLock { $0 }
     }
 
-    private let logLevel: ProtectedState = ProtectedState()
+    private let logLevel: ProtectedState<Logger.Level> = ProtectedState(.trace)
     private let cache: Mutex<Cache>
 
     public init(responseCache: Cache = [:]) {

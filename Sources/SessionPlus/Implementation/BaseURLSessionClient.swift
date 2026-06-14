@@ -16,12 +16,13 @@ public final class BaseURLSessionClient: Client {
     public let baseURL: URL
     public let session: URLSession
     private let logger: Logger = .sessionPlus
-    private let logLevel: ProtectedState = ProtectedState()
+    private let logLevel: ProtectedState<Logger.Level>
 
     public init(
         baseURL: URL,
         sessionConfiguration: URLSessionConfiguration = .default,
         sessionDelegate: (any URLSessionDelegate)? = nil,
+        logLevel: Logger.Level = .trace,
     ) {
         self.baseURL = baseURL
         session = URLSession(
@@ -29,6 +30,7 @@ public final class BaseURLSessionClient: Client {
             delegate: sessionDelegate,
             delegateQueue: nil,
         )
+        self.logLevel = ProtectedState(logLevel)
     }
 
     public var logLevelStream: AsyncStream<Logger.Level> {
